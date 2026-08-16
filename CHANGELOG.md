@@ -17,3 +17,7 @@
 - Start screen remains visible until a real sensor sample is received.
 - Sensor-dependent controls stay disabled until real sensor data is available.
 - iOS motion/orientation permission requests are initiated from the same user gesture.
+
+### Fixed
+
+- Made the repository content check ASCII-safe so Windows PowerShell 5.1 does not misread the `180°` verification token.
