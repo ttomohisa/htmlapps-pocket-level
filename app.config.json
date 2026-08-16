@@ -1,0 +1,22 @@
+{
+  "$schema": "./schemas/app-config.schema.json",
+  "name": "Pocket Level",
+  "nameJa": "Pocket Level",
+  "slug": "pocket-level",
+  "version": "1.0.0",
+  "description": "A privacy-friendly smartphone spirit level and inclinometer that runs entirely in the browser.",
+  "descriptionJa": "スマホを水平器・傾斜計として使える、プライバシー重視のブラウザーアプリです。",
+  "defaultLanguage": "auto",
+  "repository": {
+    "owner": "ttomohisa",
+    "name": "htmlapps-pocket-level"
+  },
+  "build": {
+    "output": "dist/index.html",
+    "blockRuntimeNetwork": true,
+    "selfExtract": {
+      "enabled": true,
+      "output": "dist/index.self-extract.html"
+    }
+  }
+}

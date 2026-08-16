@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f5f5f2">
+  <meta name="description" content="スマホを水平器・角度計として使える、インストール不要のローカルファーストWebアプリ。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Pocket Level</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316624f'/%3E%3Crect x='11' y='23' width='42' height='18' rx='9' fill='none' stroke='white' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='6' fill='white'/%3E%3Cpath d='M20 20v24M44 20v24' stroke='white' stroke-width='3' stroke-linecap='round' opacity='.72'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg:#f5f5f2;
+      --surface:#fff;
+      --surface-muted:#f0f0ed;
+      --surface-hover:#e9e9e5;
+      --text:#20211f;
+      --muted:#686b65;
+      --line:#dadbd6;
+      --line-strong:#bfc1ba;
+      --accent:#16624f;
+      --accent-hover:#0e503f;
+      --accent-soft:#e1f0ea;
+      --warn:#9a6300;
+      --warn-soft:#fff2cf;
+      --danger:#b3261e;
+      --focus:#4d8bc7;
+      --shadow-sm:0 1px 2px rgba(25,28,24,.08),0 1px 6px rgba(25,28,24,.04);
+      --shadow-md:0 16px 42px rgba(25,28,24,.16);
+      --header-height:66px;
+      --safe-bottom:max(12px,env(safe-area-inset-bottom));
+    }
+    *{box-sizing:border-box}
+    html{min-height:100%;background:var(--bg);scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+    button,input,select{font:inherit;color:inherit}
+    button{touch-action:manipulation}
+    button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--focus) 55%,transparent);outline-offset:2px}
+    .app-header{position:sticky;z-index:30;top:0;min-height:var(--header-height);border-bottom:1px solid color-mix(in srgb,var(--line) 82%,transparent);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(16px) saturate(1.2)}
+    .header-inner{width:min(980px,100%);min-height:var(--header-height);margin:0 auto;padding:10px clamp(14px,2.8vw,30px);display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
+    .brand-mark svg{width:22px;height:22px;display:block}
+    .brand-copy{min-width:0}
+    .brand-name{margin:0;font-size:17px;line-height:1.2;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .version-badge{display:inline-flex;align-items:center;margin-left:7px;padding:1px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface-muted);font-size:10px;font-weight:650;vertical-align:2px}
+    .brand-meta{margin:2px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .header-actions{margin-left:auto;display:flex;align-items:center;gap:13px}
+    .language-button,.header-icon-button{padding:5px 1px;border:0;background:transparent;color:var(--muted);font-weight:750;cursor:pointer;transition:color .16s ease,opacity .16s ease}
+    .language-button{font-size:12px;letter-spacing:.02em}
+    .header-icon-button{display:grid;place-items:center}
+    .language-button:hover,.header-icon-button:hover{color:var(--text)}
+    .language-button:active,.header-icon-button:active{opacity:.62}
+    .header-icon-button svg{width:20px;height:20px}
+    .main{width:min(980px,100%);margin:0 auto;padding:18px clamp(14px,2.8vw,30px) 46px}
+    .page-intro{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:0 2px 14px}
+    .page-intro h2{margin:0;font-size:clamp(20px,4vw,25px);line-height:1.3;letter-spacing:-.025em}
+    .page-intro p{margin:5px 0 0;max-width:640px;color:var(--muted);font-size:13px}
+    .privacy-badge{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:7px 10px;border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));border-radius:999px;color:var(--accent);background:var(--accent-soft);font-size:11px;font-weight:750;white-space:nowrap}
+    .privacy-badge svg{width:14px;height:14px}
+    .level-app{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start}
+    .meter-card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:var(--shadow-sm)}
+    .meter-top{padding:15px 15px 0}
+    .mode-switch{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:12px;background:var(--surface-muted)}
+    .mode-button{min-height:40px;padding:7px 10px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-weight:750;cursor:pointer}
+    .mode-button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(25,28,24,.10)}
+    .sensor-stage{position:relative;min-height:430px;padding:18px 18px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;isolation:isolate}
+    .sensor-stage.is-level::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,color-mix(in srgb,var(--accent-soft) 62%,transparent),transparent 68%);z-index:-1;pointer-events:none}
+    .sensor-stage.is-locked::after{content:"";position:absolute;inset:10px;border:1px dashed color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:16px;pointer-events:none}
+    .meter-visual{width:min(330px,82vw);aspect-ratio:1;position:relative;display:grid;place-items:center}
+    .bullseye{position:relative;width:100%;height:100%;border-radius:50%;border:1px solid var(--line-strong);background:radial-gradient(circle at center,transparent 0 18%,var(--surface-muted) 18.4% 18.9%,transparent 19.3% 39%,var(--surface-muted) 39.4% 39.9%,transparent 40.3%),linear-gradient(90deg,transparent calc(50% - .5px),var(--line) 50%,transparent calc(50% + .5px)),linear-gradient(0deg,transparent calc(50% - .5px),var(--line) 50%,transparent calc(50% + .5px)),#fbfbf9;box-shadow:inset 0 8px 24px rgba(25,28,24,.05)}
+    .target-ring{position:absolute;left:50%;top:50%;width:58px;height:58px;transform:translate(-50%,-50%);border:2px solid color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:50%;pointer-events:none}
+    .bubble{position:absolute;left:50%;top:50%;width:46px;height:46px;transform:translate(-50%,-50%);border:2px solid color-mix(in srgb,var(--accent) 55%,#fff);border-radius:50%;background:color-mix(in srgb,var(--accent) 83%,#fff);box-shadow:inset 0 6px 10px rgba(255,255,255,.22),0 5px 12px rgba(22,98,79,.22);will-change:transform;transition:background .16s ease,box-shadow .16s ease}
+    .is-level .bubble{background:var(--accent);box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 12%,transparent),0 5px 12px rgba(22,98,79,.2)}
+    .edge-vial{display:none;position:relative;width:min(420px,86vw);height:110px;border:1px solid var(--line-strong);border-radius:55px;background:linear-gradient(180deg,#fff,#f1f2ee);box-shadow:inset 0 8px 18px rgba(25,28,24,.06);overflow:hidden}
+    .edge-vial::before,.edge-vial::after{content:"";position:absolute;top:0;bottom:0;width:2px;background:color-mix(in srgb,var(--accent) 52%,var(--line));z-index:2}
+    .edge-vial::before{left:42%}.edge-vial::after{right:42%}
+    .edge-mid{position:absolute;left:50%;top:12px;bottom:12px;width:1px;background:var(--line);transform:translateX(-50%)}
+    .edge-bubble{position:absolute;left:50%;top:50%;width:74px;height:74px;transform:translate(-50%,-50%);border-radius:50%;background:color-mix(in srgb,var(--accent) 83%,#fff);box-shadow:inset 0 7px 12px rgba(255,255,255,.2),0 5px 12px rgba(22,98,79,.2);will-change:transform}
+    .is-level .edge-bubble{background:var(--accent)}
+    .edge-mode .bullseye{display:none}.edge-mode .edge-vial{display:block}.edge-mode .meter-visual{height:170px;aspect-ratio:auto;width:100%}
+    .reading{margin-top:10px;text-align:center}
+    .reading-main{display:flex;align-items:baseline;justify-content:center;gap:4px;font-variant-numeric:tabular-nums}
+    .reading-value{font-size:clamp(48px,12vw,72px);font-weight:780;line-height:1;letter-spacing:-.055em}
+    .reading-unit{font-size:22px;font-weight:700;color:var(--muted)}
+    .reading-sub{min-height:23px;margin-top:6px;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+    .axis-readings{display:flex;justify-content:center;gap:7px;margin-top:12px}
+    .axis-chip{min-width:90px;padding:7px 10px;border-radius:10px;background:var(--surface-muted);font-size:12px;font-variant-numeric:tabular-nums}
+    .axis-chip strong{font-size:14px}
+    .stage-status{display:flex;align-items:center;justify-content:center;gap:8px;min-height:28px;margin-top:13px;color:var(--muted);font-size:12px}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong)}
+    .stage-status.stable{color:var(--accent);font-weight:700}.stage-status.stable .status-dot{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+    .stage-status.warning{color:var(--warn)}.stage-status.warning .status-dot{background:var(--warn)}
+    .precision-progress{position:absolute;left:18px;right:18px;bottom:0;height:3px;border-radius:3px;background:var(--surface-muted);overflow:hidden;opacity:0;transition:opacity .16s ease}
+    .precision-progress.active{opacity:1}.precision-progress span{display:block;width:0;height:100%;background:var(--accent)}
+    .start-overlay{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;padding:22px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px)}
+    .start-overlay.hidden{display:none}
+    .start-box{max-width:390px;text-align:center}
+    .start-icon{width:66px;height:66px;margin:0 auto 16px;display:grid;place-items:center;border-radius:20px;background:var(--accent-soft);color:var(--accent)}
+    .start-icon svg{width:34px;height:34px}
+    .start-box h3{margin:0 0 8px;font-size:20px}.start-box p{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.7}
+    .button{min-height:42px;padding:8px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-weight:740;cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+    .button:hover{border-color:var(--line-strong);background:var(--surface-hover)}.button:active{transform:translateY(1px)}
+    .button.primary{border-color:var(--accent);background:var(--accent);color:#fff}.button.primary:hover{border-color:var(--accent-hover);background:var(--accent-hover)}
+    .button:disabled,.dock-button:disabled{opacity:.46;cursor:not-allowed;transform:none!important}.button.primary:disabled{border-color:var(--line-strong);background:var(--line-strong);color:#fff}.button.primary:disabled:hover{border-color:var(--line-strong);background:var(--line-strong)}
+    .button.ghost{border-color:transparent;background:transparent;color:var(--muted)}.button.danger{color:var(--danger)}
+    .start-button{min-width:190px;min-height:48px}
+    .control-dock{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 14px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--surface) 95%,transparent)}
+    .dock-button{min-height:52px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid transparent;border-radius:11px;background:transparent;color:var(--muted);font-size:11px;font-weight:740;cursor:pointer}
+    .dock-button:hover{background:var(--surface-muted);color:var(--text)}.dock-button.active{background:var(--accent-soft);color:var(--accent)}
+    .dock-button svg{width:20px;height:20px}
+    .info-panel{display:flex;flex-direction:column;gap:10px}
+    .info-card{padding:15px;border:1px solid var(--line);border-radius:15px;background:var(--surface);box-shadow:var(--shadow-sm)}
+    .info-card h3{margin:0 0 11px;font-size:14px}.info-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+    .kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;font-size:12px}.kv span{color:var(--muted)}.kv strong{font-variant-numeric:tabular-nums}
+    .tiny-note{margin-top:10px!important;font-size:11px!important}
+    .feature-list{display:grid;gap:8px}.feature-row{display:flex;align-items:flex-start;gap:9px;color:var(--muted);font-size:12px}.feature-row svg{width:17px;height:17px;flex:0 0 auto;color:var(--accent);margin-top:1px}
+    footer{width:min(980px,100%);margin:0 auto;padding:0 clamp(14px,2.8vw,30px) calc(26px + env(safe-area-inset-bottom));color:var(--muted);font-size:11px}
+    .footer-inner{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding-top:16px}.footer-inner p{margin:0}
+    dialog{width:min(600px,calc(100% - 28px));max-height:min(760px,calc(100dvh - 28px));padding:0;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:var(--shadow-md)}
+    dialog::backdrop{background:rgba(15,17,14,.52);backdrop-filter:blur(4px)}
+    .dialog-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .dialog-header h2{margin:0;font-size:17px}.dialog-close{width:38px;height:38px;padding:0;display:grid;place-items:center;border:0;border-radius:9px;background:transparent;cursor:pointer;color:var(--muted)}.dialog-close:hover{background:var(--surface-muted);color:var(--text)}.dialog-close svg{width:20px;height:20px}
+    .dialog-body{padding:18px 20px calc(22px + env(safe-area-inset-bottom));overflow:auto;max-height:calc(100dvh - 78px)}
+    .dialog-body h3{margin:24px 0 8px;padding-top:18px;border-top:1px solid var(--line);font-size:14px}.dialog-body h3:first-child{margin-top:0;padding-top:0;border-top:0}.dialog-body p,.dialog-body li{color:var(--muted);font-size:13px;line-height:1.75}.dialog-body ul{padding-left:20px}.dialog-body code{font-size:12px}
+    .setting-group{padding:14px 0;border-bottom:1px solid var(--line)}.setting-group:first-child{padding-top:0}.setting-group:last-child{border-bottom:0;padding-bottom:0}
+    .setting-title{display:flex;justify-content:space-between;gap:14px;align-items:center}.setting-title strong{font-size:13px}.setting-description{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.6}
+    .segmented-mini{display:flex;gap:4px;padding:3px;border-radius:10px;background:var(--surface-muted)}.segmented-mini button{min-width:48px;padding:6px 8px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:11px;font-weight:730;cursor:pointer}.segmented-mini button.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(25,28,24,.08)}
+    .switch{position:relative;display:inline-flex;align-items:center}.switch input{position:absolute;opacity:0;pointer-events:none}.switch-track{width:44px;height:26px;padding:3px;border-radius:999px;background:var(--line-strong);transition:background .16s ease;cursor:pointer}.switch-thumb{display:block;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:transform .16s ease}.switch input:checked + .switch-track{background:var(--accent)}.switch input:checked + .switch-track .switch-thumb{transform:translateX(18px)}.switch input:focus-visible + .switch-track{outline:3px solid color-mix(in srgb,var(--focus) 55%,transparent);outline-offset:2px}
+    .setting-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.setting-actions .button{font-size:12px;min-height:38px}
+    .cal-step{padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--surface-muted);margin:10px 0}.cal-step.active{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--accent-soft)}.cal-step strong{display:block;font-size:13px}.cal-step p{margin:5px 0 10px;font-size:12px}.cal-reading{font-variant-numeric:tabular-nums;font-size:12px;color:var(--accent);font-weight:750}
+    .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:70;max-width:min(420px,calc(100vw - 28px));padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:opacity .18s ease,transform .18s ease;font-size:12px}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .confirm-dialog{width:min(440px,calc(100% - 28px))}.confirm-dialog .dialog-body{padding-bottom:18px}.confirm-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 20px 20px}.confirm-actions .button{min-width:92px}
+    .unsupported{color:var(--warn);font-weight:700}
+    @media(max-width:760px){
+      .main{padding-top:12px;padding-bottom:112px}.page-intro{padding-bottom:10px}.page-intro p{font-size:12px}.privacy-badge{display:none}
+      .level-app{display:block}.info-panel{display:grid;grid-template-columns:1fr 1fr;margin-top:10px}.info-card.secondary{display:none}
+      .meter-card{border-radius:18px}.sensor-stage{min-height:calc(100svh - 250px);max-height:620px;padding:12px 14px 8px}.meter-visual{width:min(310px,78vw)}
+      .reading-value{font-size:clamp(54px,16vw,74px)}.control-dock{position:fixed;left:10px;right:10px;bottom:var(--safe-bottom);z-index:26;margin:0;padding:6px;border:1px solid color-mix(in srgb,var(--line) 84%,transparent);border-radius:15px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px);box-shadow:0 8px 28px rgba(25,28,24,.16)}.dock-button{min-height:55px}
+      .footer-inner{display:block}.footer-inner p+ p{margin-top:5px}
+    }
+    @media(max-width:560px){
+      .brand-meta{display:none}.header-inner{padding-top:8px;padding-bottom:8px;min-height:60px}.brand-mark{width:36px;height:36px}.brand-name{font-size:16px}.header-actions{gap:12px}
+      .page-intro h2{font-size:19px}.page-intro p{max-width:92%}.meter-top{padding:10px 10px 0}.sensor-stage{min-height:calc(100svh - 235px)}
+      .info-panel{grid-template-columns:1fr}.info-card{padding:13px}.axis-chip{min-width:82px}.reading-sub{font-size:12px}.stage-status{margin-top:10px}
+      dialog{width:100%;max-width:none;max-height:min(86dvh,760px);margin:auto 0 0;border-radius:20px 20px 0 0;border-bottom:0}.dialog-body{max-height:calc(86dvh - 70px)}.confirm-dialog{width:100%}
+    }
+    @media(max-width:360px){.header-actions{gap:9px}.brand-mark{width:34px;height:34px}.brand-name{font-size:15px}.version-badge{display:none}.main{padding-left:10px;padding-right:10px}.meter-visual{width:min(280px,78vw)}.sensor-stage{min-height:420px}.axis-readings{gap:5px}.axis-chip{min-width:74px;padding:6px 7px}.mode-button{font-size:13px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="7.5" width="19" height="9" rx="4.5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M7 5.5v13M17 5.5v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/></svg></div>
+        <div class="brand-copy">
+          <h1 class="brand-name">Pocket Level <span class="version-badge" id="versionBadge">v1.0</span></h1>
+          <p class="brand-meta" data-i18n="brandMeta">スマホが、そのまま水平器に。</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="language-button" id="languageButton" aria-label="Switch language">EN</button>
+        <button type="button" class="header-icon-button" id="helpButton" aria-label="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.8 9.2a2.4 2.4 0 0 1 4.6.9c0 1.8-2.4 2-2.4 3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- APP:BEGIN -->
+  <main class="main">
+    <section class="page-intro" aria-labelledby="pageTitle">
+      <div>
+        <h2 id="pageTitle" data-i18n="pageTitle">置くだけ、当てるだけ。スマホで水平を確認。</h2>
+        <p data-i18n="pageLead">端末のモーションセンサーだけを使って、平面の水平・辺の傾きを測ります。測定データは外部へ送信しません。</p>
+      </div>
+      <div class="privacy-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="1.8"/><rect x="5" y="10" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.8"/></svg><span data-i18n="localOnly">端末内だけで処理</span></div>
+    </section>
+
+    <div class="level-app">
+      <section class="meter-card" aria-label="Level meter">
+        <div class="meter-top">
+          <div class="mode-switch" role="tablist" aria-label="測定モード">
+            <button type="button" class="mode-button" id="flatModeButton" role="tab" aria-selected="true" data-mode="flat" data-i18n="flatMode">平面</button>
+            <button type="button" class="mode-button" id="edgeModeButton" role="tab" aria-selected="false" data-mode="edge" data-i18n="edgeMode">辺・垂直</button>
+          </div>
+        </div>
+
+        <div class="sensor-stage" id="sensorStage">
+          <div class="meter-visual" aria-hidden="true">
+            <div class="bullseye">
+              <div class="target-ring"></div>
+              <div class="bubble" id="bubble"></div>
+            </div>
+            <div class="edge-vial">
+              <div class="edge-mid"></div>
+              <div class="edge-bubble" id="edgeBubble"></div>
+            </div>
+          </div>
+
+          <div class="reading" aria-live="off">
+            <div class="reading-main"><span class="reading-value" id="mainReading">0.0</span><span class="reading-unit">°</span></div>
+            <div class="reading-sub" id="readingSub">X 0.0° / Y 0.0°</div>
+            <div class="axis-readings" id="axisReadings">
+              <div class="axis-chip">X&nbsp; <strong id="xReading">0.0°</strong></div>
+              <div class="axis-chip">Y&nbsp; <strong id="yReading">0.0°</strong></div>
+            </div>
+          </div>
+
+          <div class="stage-status" id="stageStatus"><span class="status-dot"></span><span id="stageStatusText" data-i18n="waiting">センサー待機中</span></div>
+          <div class="precision-progress" id="precisionProgress" aria-hidden="true"><span></span></div>
+
+          <div class="start-overlay" id="startOverlay">
+            <div class="start-box">
+              <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/></svg></div>
+              <h3 data-i18n="startTitle">モーションセンサーを使います</h3>
+              <p id="startDescription" data-i18n="startDescription">測定を開始すると、端末の傾き情報へのアクセスを要求する場合があります。位置情報・カメラ・ネットワークは使用しません。</p>
+              <button type="button" class="button primary start-button" id="startButton" data-i18n="startMeasure">測定を開始</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-dock" aria-label="測定操作">
+          <button type="button" class="dock-button" id="zeroButton"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span data-i18n="setZero">ゼロ設定</span></button>
+          <button type="button" class="dock-button" id="holdButton"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z" fill="currentColor"/></svg><span id="holdLabel" data-i18n="hold">固定</span></button>
+          <button type="button" class="dock-button" id="settingsButton"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-width="1.8"/><path d="M4.7 14.7 3.5 16.8l2.7 2.7 2.1-1.2c.6.3 1.2.6 1.9.8l.6 2.4h3.8l.6-2.4c.7-.2 1.3-.5 1.9-.8l2.1 1.2 2.7-2.7-1.2-2.1c.3-.6.6-1.2.8-1.9l2.4-.6V8.4L21.5 7.8c-.2-.7-.5-1.3-.8-1.9l1.2-2.1-2.7-2.7-2.1 1.2c-.6-.3-1.2-.6-1.9-.8L14.6-.9h-3.8l-.6 2.4c-.7.2-1.3.5-1.9.8L6.2 1.1 3.5 3.8l1.2 2.1c-.3.6-.6 1.2-.8 1.9l-2.4.6v3.8l2.4.6c.2.7.5 1.3.8 1.9Z" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round" transform="scale(.86) translate(2 2)"/></svg><span data-i18n="settings">設定</span></button>
+        </div>
+      </section>
+
+      <aside class="info-panel" aria-label="Measurement information">
+        <section class="info-card">
+          <h3 data-i18n="currentInfo">現在の測定</h3>
+          <div class="kv">
+            <span data-i18n="tolerance">水平判定</span><strong id="toleranceDisplay">±0.3°</strong>
+            <span data-i18n="slope">勾配</span><strong id="slopeDisplay">0.0%</strong>
+            <span data-i18n="stability">安定度</span><strong id="stabilityDisplay">—</strong>
+            <span data-i18n="reference">基準</span><strong id="referenceDisplay" data-i18n="factoryZero">標準</strong>
+          </div>
+          <p class="tiny-note" id="precisionSummary"></p>
+        </section>
+        <section class="info-card secondary">
+          <h3 data-i18n="betterMeasure">測りやすくするコツ</h3>
+          <div class="feature-list">
+            <div class="feature-row"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tipCase">ケースやカメラの出っ張りで端末が浮く場合は、同じ条件で校正してください。</span></div>
+            <div class="feature-row"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h16M12 4v16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span data-i18n="tipStable">「安定」と表示されてから値を読むと、手ブレの影響を減らせます。</span></div>
+            <div class="feature-row"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="1.8"/><path d="M9 9h6v6H9z" stroke="currentColor" stroke-width="1.8"/></svg><span data-i18n="tipPrecision">より丁寧に測るときは、設定の「2秒平均」で読み値を固定できます。</span></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <!-- APP:END -->
+
+  <footer>
+    <div class="footer-inner">
+      <p><span data-i18n="footerPrivacy">センサーデータは端末内でのみ処理されます。</span></p>
+      <p>HTML Apps · Pocket Level</p>
+    </div>
+  </footer>
+
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <div class="dialog-header"><h2 id="settingsTitle" data-i18n="settings">設定</h2><button class="dialog-close" type="button" data-close-dialog="settingsDialog" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="dialog-body">
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="toleranceSetting">水平とみなす範囲</strong><p class="setting-description" data-i18n="toleranceHelp">この角度以内になると、水平として強調表示します。</p></div><div class="segmented-mini" id="toleranceButtons" role="group" aria-label="Tolerance"><button type="button" data-value="0.1">0.1°</button><button type="button" data-value="0.3" class="active">0.3°</button><button type="button" data-value="0.5">0.5°</button><button type="button" data-value="1">1.0°</button></div></div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="vibration">水平時に振動</strong><p class="setting-description" data-i18n="vibrationHelp">対応端末では、水平になった瞬間だけ短く振動します。</p></div><label class="switch"><input type="checkbox" id="vibrationToggle" checked><span class="switch-track"><span class="switch-thumb"></span></span></label></div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="sound">水平時に音</strong><p class="setting-description" data-i18n="soundHelp">画面を見づらい姿勢でも、水平になったことを音で知らせます。</p></div><label class="switch"><input type="checkbox" id="soundToggle"><span class="switch-track"><span class="switch-thumb"></span></span></label></div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="wakeLock">測定中は画面を消さない</strong><p class="setting-description" id="wakeLockHelp" data-i18n="wakeLockHelp">対応ブラウザーのHTTPS表示時に有効です。</p></div><label class="switch"><input type="checkbox" id="wakeLockToggle" checked><span class="switch-track"><span class="switch-thumb"></span></span></label></div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="precisionMeasure">2秒平均で精密測定</strong><p class="setting-description" data-i18n="precisionHelp">2秒間の読み値を平均し、結果を固定します。細かな揺れを抑えたいときに使います。</p></div></div>
+        <div class="setting-actions"><button type="button" class="button" id="precisionButton" data-i18n="startPrecision">2秒平均を開始</button></div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="flipCalibration">180°反転の2点校正</strong><p class="setting-description" data-i18n="flipCalibrationHelp">完全に水平な基準面がなくても、同じ面で端末を180°回して2回測ることで端末側の偏りを推定します。</p></div></div>
+        <div class="setting-actions"><button type="button" class="button" id="calibrateButton" data-i18n="openCalibration">校正する</button><button type="button" class="button ghost" id="resetCalibrationButton" data-i18n="resetCalibration">校正をリセット</button></div>
+        <p class="setting-description" id="calibrationStatus"></p>
+      </div>
+      <div class="setting-group">
+        <div class="setting-title"><div><strong data-i18n="resetReference">ゼロ基準をリセット</strong><p class="setting-description" data-i18n="resetReferenceHelp">「ゼロ設定」で登録した一時的な基準だけを標準に戻します。</p></div></div>
+        <div class="setting-actions"><button type="button" class="button ghost" id="resetZeroButton" data-i18n="resetZero">ゼロ基準を戻す</button></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="calibrationDialog" aria-labelledby="calibrationTitle">
+    <div class="dialog-header"><h2 id="calibrationTitle" data-i18n="calibrationTitle">180°反転の2点校正</h2><button class="dialog-close" type="button" data-close-dialog="calibrationDialog" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="dialog-body">
+      <p data-i18n="calibrationIntro">端末を同じ面に置いたまま180°回して2回記録します。面そのものの傾きを打ち消して、端末側のズレを推定します。</p>
+      <div class="cal-step active" id="calStep1"><strong data-i18n="calStep1Title">1. 端末を面に置く</strong><p data-i18n="calStep1Text">画面を上向きにして置き、端末が動かなくなってから記録してください。</p><button type="button" class="button" id="captureCal1" data-i18n="recordFirst">1回目を記録</button><div class="cal-reading" id="cal1Reading"></div></div>
+      <div class="cal-step" id="calStep2"><strong data-i18n="calStep2Title">2. その場で180°回す</strong><p data-i18n="calStep2Text">端末を裏返さず、同じ面の上で上下を入れ替えるように180°回転してください。</p><button type="button" class="button" id="captureCal2" disabled data-i18n="recordSecond">2回目を記録</button><div class="cal-reading" id="cal2Reading"></div></div>
+      <p class="setting-description" data-i18n="calibrationLimit">※ ケースやカメラ部の出っ張りで接地状態が変わる場合、完全には補正できません。精密工具の代替ではありません。</p>
+    </div>
+  </dialog>
+
+  <dialog id="helpDialog" aria-labelledby="helpTitle">
+    <div class="dialog-header"><h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2><button class="dialog-close" type="button" data-close-dialog="helpDialog" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="dialog-body">
+      <!-- APP:HELP:BEGIN -->
+      <h3 data-i18n="helpBasicTitle">基本操作</h3>
+      <ul><li data-i18n="helpBasic1">「測定を開始」を押してセンサー権限を許可します。</li><li data-i18n="helpBasic2">平面モードはスマホを画面上向きで面に置きます。気泡が中央に来れば水平です。</li><li data-i18n="helpBasic3">辺・垂直モードは端末の長辺または短辺を面に当て、1軸の傾きを確認します。</li><li data-i18n="helpBasic4">「ゼロ設定」は現在の角度を0°として扱います。「固定」は読み値を一時停止します。</li></ul>
+      <h3 data-i18n="helpPrecisionTitle">校正と精密測定</h3>
+      <p data-i18n="helpPrecisionText">通常はそのまま使えます。端末固有のズレが気になる場合は、設定の「180°反転の2点校正」を使ってください。「2秒平均」は短時間の揺れを平均して読み値を固定します。</p>
+      <h3 data-i18n="helpPrivacyTitle">プライバシー</h3>
+      <p data-i18n="helpPrivacyText">使用するのは端末の傾き・加速度センサーだけです。位置情報、カメラ、マイクは使いません。測定値と設定は外部へ送信されません。設定と校正値はLocalStorageが利用できる場合のみ端末内に保存されます。</p>
+      <h3 data-i18n="helpLimitTitle">注意事項</h3>
+      <ul><li data-i18n="helpLimit1">端末のセンサー精度、ケース、カメラの出っ張り、接地状態により誤差が生じます。施工検査など精度保証が必要な用途では専用の測定器を使用してください。</li><li data-i18n="helpLimit2">ブラウザーによってはセンサー利用にHTTPSと明示的な権限が必要です。file://で開いた場合、画面は表示できても測定できないことがあります。</li><li data-i18n="helpLimit3">画面起動ロックと振動は未対応ブラウザーでは自動的に無効になります。</li></ul>
+      <!-- APP:HELP:END -->
+    </div>
+  </dialog>
+
+  <dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmTitle">
+    <div class="dialog-header"><h2 id="confirmTitle">Confirm</h2><button class="dialog-close" type="button" id="confirmClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="dialog-body"><p id="confirmMessage"></p></div>
+    <div class="confirm-actions"><button type="button" class="button" id="confirmCancel">Cancel</button><button type="button" class="button danger" id="confirmOk">OK</button></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="ariaStatus" class="sr-only" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0"></div>
+
+  <script id="appConfig" type="application/json">{"$schema":"./schemas/app-config.schema.json","name":"Pocket Level","nameJa":"Pocket Level","slug":"pocket-level","version":"1.0.0","description":"A privacy-friendly smartphone spirit level and inclinometer that runs entirely in the browser.","descriptionJa":"スマホを水平器・傾斜計として使える、プライバシー重視のブラウザーアプリです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-pocket-level"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"}}}</script>
+  <script id="buildManifest" type="application/json">{"name":"Pocket Level","version":"1.0.0","generatedAt":"2026-08-16T05:38:12.9538525+00:00","dependencyCount":0,"source":"src/index.template.html"}</script>
+  <script id="embeddedAssets" type="text/plain">e30=</script>
+  <script>
+  (() => {
+    'use strict';
+
+    const translations = {
+      ja: {
+        brandMeta:'スマホが、そのまま水平器に。',pageTitle:'置くだけ、当てるだけ。スマホで水平を確認。',pageLead:'端末のモーションセンサーだけを使って、平面の水平・辺の傾きを測ります。測定データは外部へ送信しません。',localOnly:'端末内だけで処理',flatMode:'平面',edgeMode:'辺・垂直',waiting:'センサー待機中',startTitle:'モーションセンサーを使います',startDescription:'測定を開始すると、端末の傾き情報へのアクセスを要求する場合があります。位置情報・カメラ・ネットワークは使用しません。',startMeasure:'測定を開始',setZero:'ゼロ設定',hold:'固定',resume:'再開',settings:'設定',currentInfo:'現在の測定',tolerance:'水平判定',slope:'勾配',stability:'安定度',reference:'基準',factoryZero:'標準',customZero:'ゼロ設定済み',betterMeasure:'測りやすくするコツ',tipCase:'ケースやカメラの出っ張りで端末が浮く場合は、同じ条件で校正してください。',tipStable:'「安定」と表示されてから値を読むと、手ブレの影響を減らせます。',tipPrecision:'より丁寧に測るときは、設定の「2秒平均」で読み値を固定できます。',footerPrivacy:'センサーデータは端末内でのみ処理されます。',
+        toleranceSetting:'水平とみなす範囲',toleranceHelp:'この角度以内になると、水平として強調表示します。',vibration:'水平時に振動',vibrationHelp:'対応端末では、水平になった瞬間だけ短く振動します。',sound:'水平時に音',soundHelp:'画面を見づらい姿勢でも、水平になったことを音で知らせます。',wakeLock:'測定中は画面を消さない',wakeLockHelp:'対応ブラウザーのHTTPS表示時に有効です。',precisionMeasure:'2秒平均で精密測定',precisionHelp:'2秒間の読み値を平均し、結果を固定します。細かな揺れを抑えたいときに使います。',startPrecision:'2秒平均を開始',flipCalibration:'180°反転の2点校正',flipCalibrationHelp:'完全に水平な基準面がなくても、同じ面で端末を180°回して2回測ることで端末側の偏りを推定します。',openCalibration:'校正する',resetCalibration:'校正をリセット',resetReference:'ゼロ基準をリセット',resetReferenceHelp:'「ゼロ設定」で登録した一時的な基準だけを標準に戻します。',resetZero:'ゼロ基準を戻す',
+        calibrationTitle:'180°反転の2点校正',calibrationIntro:'端末を同じ面に置いたまま180°回して2回記録します。面そのものの傾きを打ち消して、端末側のズレを推定します。',calStep1Title:'1. 端末を面に置く',calStep1Text:'画面を上向きにして置き、端末が動かなくなってから記録してください。',recordFirst:'1回目を記録',calStep2Title:'2. その場で180°回す',calStep2Text:'端末を裏返さず、同じ面の上で上下を入れ替えるように180°回転してください。',recordSecond:'2回目を記録',calibrationLimit:'※ ケースやカメラ部の出っ張りで接地状態が変わる場合、完全には補正できません。精密工具の代替ではありません。',
+        helpTitle:'使い方と注意事項',helpBasicTitle:'基本操作',helpBasic1:'「測定を開始」を押してセンサー権限を許可します。',helpBasic2:'平面モードはスマホを画面上向きで面に置きます。気泡が中央に来れば水平です。',helpBasic3:'辺・垂直モードは端末の長辺または短辺を面に当て、1軸の傾きを確認します。',helpBasic4:'「ゼロ設定」は現在の角度を0°として扱います。「固定」は読み値を一時停止します。',helpPrecisionTitle:'校正と精密測定',helpPrecisionText:'通常はそのまま使えます。端末固有のズレが気になる場合は、設定の「180°反転の2点校正」を使ってください。「2秒平均」は短時間の揺れを平均して読み値を固定します。',helpPrivacyTitle:'プライバシー',helpPrivacyText:'使用するのは端末の傾き・加速度センサーだけです。位置情報、カメラ、マイクは使いません。測定値と設定は外部へ送信されません。設定と校正値はLocalStorageが利用できる場合のみ端末内に保存されます。',helpLimitTitle:'注意事項',helpLimit1:'端末のセンサー精度、ケース、カメラの出っ張り、接地状態により誤差が生じます。施工検査など精度保証が必要な用途では専用の測定器を使用してください。',helpLimit2:'ブラウザーによってはセンサー利用にHTTPSと明示的な権限が必要です。file://で開いた場合、画面は表示できても測定できないことがあります。',helpLimit3:'画面起動ロックと振動は未対応ブラウザーでは自動的に無効になります。',
+        sensorActive:'測定中',sensorStable:'安定',sensorMoving:'測定中',sensorLocked:'読み値を固定中',sensorChecking:'センサーを確認中…',sensorCheckingDescription:'端末の傾き情報を待っています。値を取得できるまで測定画面には切り替わりません。',sensorUnavailableButton:'この環境では利用できません',sensorNoData:'センサー値を取得できませんでした。ブラウザーのモーションセンサー権限を確認して、ページを再読み込みしてください。',sensorLocalUnavailable:'このブラウザーではローカルHTMLからセンサー値を取得できませんでした。Browser KittyなどHTTPSのページで開いてください。',sensorPermissionDenied:'モーションセンサーの利用が許可されていません。ブラウザーのサイト設定で許可してからページを再読み込みしてください。',sensorUnsupported:'このブラウザー／端末ではモーションセンサーを利用できません。',sensorNeedsHttps:'この開き方ではモーションセンサーを利用できません。HTTPSのページで開いてください。',edgePosture:'端末を辺で立ててください',levelNow:'水平です',notLevel:'{value}° 傾いています',stabilityGood:'安定',stabilityFair:'やや揺れ',stabilityMoving:'動いています',zeroSet:'現在の角度を0°に設定しました',zeroReset:'ゼロ基準を標準に戻しました',locked:'読み値を固定しました',unlocked:'測定を再開しました',precisionRunning:'2秒間の平均を測定しています…',precisionDone:'2秒平均を固定しました',precisionFailed:'十分なセンサーデータを取得できませんでした',precisionResult:'2秒平均 · ばらつき ±{spread}°',calibrated:'校正済み · X {x}° / Y {y}°',notCalibrated:'未校正',calCapture:'記録中…端末を動かさないでください',calFirstDone:'1回目を記録しました。端末を180°回してください。',calDone:'2点校正を保存しました',calReset:'校正値をリセットしました',calResetTitle:'校正をリセットしますか？',calResetMessage:'180°反転の2点校正で保存した補正値を削除します。',cancel:'キャンセル',reset:'リセット',close:'閉じる',wakeUnavailable:'この環境では画面起動ロックを利用できません',languageName:'EN'
+      },
+      en: {
+        brandMeta:'A level that is already in your pocket.',pageTitle:'Set it down or hold it against an edge. Check level instantly.',pageLead:'Measure flat surfaces and edges using only your phone’s motion sensors. Measurement data never leaves the page.',localOnly:'Processed on device',flatMode:'Surface',edgeMode:'Edge / plumb',waiting:'Waiting for sensors',startTitle:'Use motion sensors',startDescription:'Starting measurement may ask for access to device motion. Location, camera, microphone, and network access are not used.',startMeasure:'Start measuring',setZero:'Set zero',hold:'Hold',resume:'Resume',settings:'Settings',currentInfo:'Current measurement',tolerance:'Level tolerance',slope:'Slope',stability:'Stability',reference:'Reference',factoryZero:'Default',customZero:'Custom zero',betterMeasure:'Tips for better readings',tipCase:'If a case or camera bump lifts the phone, calibrate with the phone in the same physical setup.',tipStable:'Read the value after “Stable” appears to reduce hand-movement noise.',tipPrecision:'For a careful reading, use the 2-second average in Settings.',footerPrivacy:'Sensor readings are processed only on this device.',
+        toleranceSetting:'Level tolerance',toleranceHelp:'The meter highlights level when the reading is within this angle.',vibration:'Vibrate when level',vibrationHelp:'On supported devices, vibrate briefly only when the meter enters the level zone.',sound:'Sound when level',soundHelp:'Hear when the surface reaches level even when the display is hard to see.',wakeLock:'Keep screen awake while measuring',wakeLockHelp:'Available on supported browsers when served over HTTPS.',precisionMeasure:'Precision 2-second average',precisionHelp:'Average readings for two seconds and hold the result to reduce small sensor fluctuations.',startPrecision:'Start 2-second average',flipCalibration:'180° two-point calibration',flipCalibrationHelp:'Estimate device-side bias by measuring twice on the same surface after rotating the phone 180°, even without a perfectly level reference.',openCalibration:'Calibrate',resetCalibration:'Reset calibration',resetReference:'Reset zero reference',resetReferenceHelp:'Return only the temporary “Set zero” reference to the default.',resetZero:'Reset zero',
+        calibrationTitle:'180° two-point calibration',calibrationIntro:'Record twice on the same surface after rotating the phone 180°. The surface tilt is canceled to estimate device-side bias.',calStep1Title:'1. Place the phone on the surface',calStep1Text:'Keep the screen facing up and wait until the phone stops moving.',recordFirst:'Record first position',calStep2Title:'2. Rotate it 180° in place',calStep2Text:'Do not flip the phone. Rotate it on the same surface so the top and bottom swap directions.',recordSecond:'Record second position',calibrationLimit:'Cases and camera bumps can change the contact geometry, so calibration cannot remove every source of error. This is not a replacement for certified precision tools.',
+        helpTitle:'How to use & notes',helpBasicTitle:'Basic use',helpBasic1:'Tap “Start measuring” and allow motion-sensor access if requested.',helpBasic2:'In Surface mode, place the phone screen-up. The surface is level when the bubble is centered.',helpBasic3:'In Edge / plumb mode, rest a long or short edge of the phone against the surface and read the single-axis tilt.',helpBasic4:'“Set zero” treats the current angle as 0°. “Hold” freezes the current reading.',helpPrecisionTitle:'Calibration & precision',helpPrecisionText:'Normal use needs no calibration. If device-specific bias is noticeable, use 180° two-point calibration. The 2-second average reduces short-term fluctuations and holds the result.',helpPrivacyTitle:'Privacy',helpPrivacyText:'Only device tilt/motion sensors are used. Location, camera, and microphone are not used. Readings are not sent anywhere. Preferences and calibration values are stored only in localStorage when available.',helpLimitTitle:'Important notes',helpLimit1:'Sensor accuracy, cases, camera bumps, and how the phone contacts the surface can introduce error. Use dedicated measuring equipment for work that requires certified accuracy.',helpLimit2:'Some browsers require HTTPS and explicit permission for sensor access. A file:// copy may open correctly but may not receive sensor readings. When sensor access is unavailable, the app shows the reason and disables Start.',helpLimit3:'Wake Lock and vibration silently fall back when unsupported.',
+        sensorActive:'Measuring',sensorStable:'Stable',sensorMoving:'Measuring',sensorLocked:'Reading held',sensorChecking:'Checking sensors…',sensorCheckingDescription:'Waiting for device tilt data. The measurement screen will appear only after real sensor values are received.',sensorUnavailableButton:'Unavailable in this environment',sensorNoData:'No sensor values were received. Check motion-sensor permission in your browser, then reload the page.',sensorLocalUnavailable:'This browser did not provide sensor values to a local HTML file. Open the app from an HTTPS page such as Browser Kitty.',sensorPermissionDenied:'Motion-sensor access is not allowed. Enable it in the browser site settings, then reload the page.',sensorUnsupported:'Motion sensors are not available on this browser or device.',sensorNeedsHttps:'Motion sensors are not available with this page context. Open the app over HTTPS.',edgePosture:'Stand the phone on one of its edges',levelNow:'Level',notLevel:'Tilted by {value}°',stabilityGood:'Stable',stabilityFair:'Slight movement',stabilityMoving:'Moving',zeroSet:'Current reading is now the zero reference',zeroReset:'Zero reference returned to default',locked:'Reading held',unlocked:'Measurement resumed',precisionRunning:'Averaging for two seconds…',precisionDone:'2-second average held',precisionFailed:'Not enough sensor samples were received',precisionResult:'2-second average · spread ±{spread}°',calibrated:'Calibrated · X {x}° / Y {y}°',notCalibrated:'Not calibrated',calCapture:'Recording… keep the phone still',calFirstDone:'First position recorded. Rotate the phone 180°.',calDone:'Two-point calibration saved',calReset:'Calibration reset',calResetTitle:'Reset calibration?',calResetMessage:'This removes the offsets saved by 180° two-point calibration.',cancel:'Cancel',reset:'Reset',close:'Close',wakeUnavailable:'Wake Lock is not available in this environment',languageName:'日本語'
+      }
+    };
+
+    const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(el => [el.id, el]));
+    const config = safeJson('appConfig', {});
+    const manifest = safeJson('buildManifest', {});
+    const storageKey = 'pocket-level:v1';
+    const stored = loadStored();
+    const state = {
+      lang: stored.lang || ((navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : 'en'),
+      mode: stored.mode === 'edge' ? 'edge' : 'flat',
+      running: false,
+      hasSensorData: false,
+      lastSensorAt: 0,
+      source: null,
+      gravity: null,
+      filteredGravity: null,
+      rawFlat: {x:0,y:0},
+      current: {x:0,y:0,main:0,edge:0,slope:0,postureOk:true},
+      display: null,
+      zero: {flatX:Number(stored.zero?.flatX)||0,flatY:Number(stored.zero?.flatY)||0,edge:Number(stored.zero?.edge)||0},
+      calibration: {biasX:Number(stored.calibration?.biasX)||0,biasY:Number(stored.calibration?.biasY)||0,updatedAt:stored.calibration?.updatedAt||null},
+      tolerance:[0.1,0.3,0.5,1].includes(Number(stored.tolerance))?Number(stored.tolerance):0.3,
+      vibration: stored.vibration !== false,
+      sound: stored.sound === true,
+      wakeEnabled: stored.wakeEnabled !== false,
+      wakeLock: null,
+      locked: false,
+      lockedReading: null,
+      lastLevelState: false,
+      samples: [],
+      precision: null,
+      precisionResult: null,
+      calibrationCapture: null,
+      calFirst: null,
+      audioContext: null,
+      sensorTimeout: null,
+      sensorErrorKey: null,
+      sensorFatal: false,
+      sensorListenersAttached: false
+    };
+
+    window.StandaloneAssets = (() => {
+      let parsed = null;
+      function data(){ if(parsed) return parsed; try{ const raw=atob((els.embeddedAssets?.textContent||'').trim()); parsed=JSON.parse(new TextDecoder().decode(Uint8Array.from(raw,c=>c.charCodeAt(0)))); }catch{ parsed={}; } return parsed; }
+      return {list:()=>Object.keys(data()),has:(lib,key)=>Boolean(data()?.[lib]?.[key]),text:()=>null,bytes:()=>null,blobUrl:()=>null};
+    })();
+
+    function safeJson(id,fallback){try{return JSON.parse(document.getElementById(id)?.textContent||'')}catch{return fallback}}
+    function loadStored(){try{return JSON.parse(localStorage.getItem(storageKey)||'{}')}catch{return {}}}
+    function persist(){try{localStorage.setItem(storageKey,JSON.stringify({lang:state.lang,mode:state.mode,zero:state.zero,calibration:state.calibration,tolerance:state.tolerance,vibration:state.vibration,sound:state.sound,wakeEnabled:state.wakeEnabled}))}catch{}}
+    function t(key,vars={}){let text=translations[state.lang][key]??translations.ja[key]??key;for(const [k,v] of Object.entries(vars))text=text.replaceAll(`{${k}}`,v);return text}
+    function fmt(value,digits=1){if(!Number.isFinite(value))return '—';const v=Math.abs(value)<0.05?0:value;return v.toFixed(digits)}
+    function clamp(v,min,max){return Math.min(max,Math.max(min,v))}
+    function rad(deg){return deg*Math.PI/180}
+    function deg(radValue){return radValue*180/Math.PI}
+    function normalizeGravity(v){const m=Math.hypot(v.x,v.y,v.z);if(!Number.isFinite(m)||m<0.001)return null;return{x:v.x/m,y:v.y/m,z:v.z/m}}
+    function gravityFromOrientation(beta,gamma){if(!Number.isFinite(beta)||!Number.isFinite(gamma))return null;const b=rad(beta),g=rad(gamma);return normalizeGravity({x:-Math.sin(g)*Math.cos(b),y:Math.sin(b),z:Math.cos(g)*Math.cos(b)})}
+    function lowPass(next){if(!state.filteredGravity){state.filteredGravity={...next};return state.filteredGravity}const a=0.2;state.filteredGravity.x+=(next.x-state.filteredGravity.x)*a;state.filteredGravity.y+=(next.y-state.filteredGravity.y)*a;state.filteredGravity.z+=(next.z-state.filteredGravity.z)*a;state.filteredGravity=normalizeGravity(state.filteredGravity)||next;return state.filteredGravity}
+
+    function rawFlatAngles(g){return{x:deg(Math.asin(clamp(g.x,-1,1))),y:deg(Math.asin(clamp(g.y,-1,1)))}}
+    function calculate(g){
+      const raw=rawFlatAngles(g); state.rawFlat=raw;
+      const flatX=raw.x-state.calibration.biasX-state.zero.flatX;
+      const flatY=raw.y-state.calibration.biasY-state.zero.flatY;
+      const main=Math.hypot(flatX,flatY);
+      const absX=Math.abs(g.x),absY=Math.abs(g.y); let edgeRaw, postureOk;
+      if(absY>=absX){edgeRaw=deg(Math.atan2(g.x,Math.max(absY,.0001)));}else{edgeRaw=deg(Math.atan2(g.y,Math.max(absX,.0001)));}
+      postureOk=Math.abs(g.z)<0.52;
+      const edge=edgeRaw-state.zero.edge;
+      const active=state.mode==='flat'?main:Math.abs(edge);
+      const slope=Math.tan(rad(clamp(active,0,89)))*100;
+      return{x:flatX,y:flatY,main,edge,slope,postureOk,edgeRaw};
+    }
+
+    function onMotion(event){const a=event.accelerationIncludingGravity;if(!a||![a.x,a.y,a.z].every(Number.isFinite))return;receiveGravity({x:a.x,y:a.y,z:a.z},'motion')}
+    function onOrientation(event){if(state.source==='motion'&&performance.now()-state.lastSensorAt<500)return;const g=gravityFromOrientation(Number(event.beta),Number(event.gamma));if(g)receiveGravity(g,'orientation')}
+    function receiveGravity(raw,source){const normalized=normalizeGravity(raw);if(!normalized)return;const firstSample=!state.hasSensorData;state.source=source;state.lastSensorAt=performance.now();state.hasSensorData=true;state.sensorErrorKey=null;state.sensorFatal=false;clearTimeout(state.sensorTimeout);const g=lowPass(normalized);state.gravity=g;state.current=calculate(g);trackStability(state.current);trackPrecision(state.current);trackCalibrationCapture();if(!state.locked)state.display={...state.current};if(firstSample){state.running=true;els.startOverlay.classList.add('hidden');syncSensorStartUI();updateSensorDependentControls();announce(t('sensorActive'));if(state.wakeEnabled)requestWakeLock()}renderMeter();}
+
+    function trackStability(reading){const value=state.mode==='flat'?{a:reading.x,b:reading.y}:{a:reading.edge,b:0};state.samples.push({...value,t:performance.now()});if(state.samples.length>24)state.samples.shift()}
+    function std(values){if(values.length<2)return Infinity;const mean=values.reduce((a,b)=>a+b,0)/values.length;return Math.sqrt(values.reduce((a,b)=>a+(b-mean)**2,0)/values.length)}
+    function stabilityMetric(){if(state.samples.length<10)return Infinity;return Math.max(std(state.samples.map(s=>s.a)),std(state.samples.map(s=>s.b)))}
+    function stabilityLabel(metric){if(metric<0.08)return t('stabilityGood');if(metric<0.22)return t('stabilityFair');return t('stabilityMoving')}
+
+    function sensorCapability(){
+      const hasMotion=typeof DeviceMotionEvent!=='undefined';
+      const hasOrientation=typeof DeviceOrientationEvent!=='undefined';
+      if(!hasMotion&&!hasOrientation)return{ok:false,key:'sensorUnsupported'};
+      if(window.isSecureContext===false)return{ok:false,key:'sensorNeedsHttps'};
+      return{ok:true,key:null};
+    }
+    function updateSensorDependentControls(){
+      const enabled=state.hasSensorData;
+      els.zeroButton.disabled=!enabled;els.holdButton.disabled=!enabled;
+      els.precisionButton.disabled=!enabled;els.calibrateButton.disabled=!enabled;
+    }
+    function syncSensorStartUI(){
+      if(state.sensorErrorKey){
+        els.startDescription.textContent=t(state.sensorErrorKey);els.startDescription.classList.add('unsupported');
+        els.startButton.textContent=state.sensorFatal?t('sensorUnavailableButton'):t('startMeasure');
+        els.startButton.disabled=state.sensorFatal;return;
+      }
+      if(state.running&&!state.hasSensorData){
+        els.startDescription.textContent=t('sensorCheckingDescription');els.startDescription.classList.remove('unsupported');
+        els.startButton.textContent=t('sensorChecking');els.startButton.disabled=true;return;
+      }
+      els.startDescription.textContent=t('startDescription');els.startDescription.classList.remove('unsupported');
+      els.startButton.textContent=t('startMeasure');els.startButton.disabled=false;
+    }
+    function attachSensorListeners(){if(state.sensorListenersAttached)return;window.addEventListener('devicemotion',onMotion,{passive:true});window.addEventListener('deviceorientation',onOrientation,{passive:true});state.sensorListenersAttached=true}
+    async function requestPermissions(){
+      const requests=[];
+      try{
+        if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function')requests.push(Promise.resolve(DeviceMotionEvent.requestPermission()));
+        if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')requests.push(Promise.resolve(DeviceOrientationEvent.requestPermission()));
+        if(!requests.length)return;
+        const results=await Promise.all(requests);
+        if(results.some(result=>result!=='granted'))throw new Error('denied');
+      }catch(err){throw err}
+    }
+    async function startSensors(){
+      if(state.sensorFatal)return;
+      const capability=sensorCapability();
+      if(!capability.ok){showSensorError(capability.key,true,true);return}
+      state.running=true;state.hasSensorData=false;state.sensorErrorKey=null;syncSensorStartUI();
+      try{await requestPermissions()}catch{showSensorError('sensorPermissionDenied',true,true);return}
+      attachSensorListeners();
+      clearTimeout(state.sensorTimeout);state.sensorTimeout=setTimeout(()=>{if(!state.hasSensorData)showSensorError(location.protocol==='file:'?'sensorLocalUnavailable':'sensorNoData',true,true)},2800);
+    }
+    function showSensorError(key,overlay=true,fatal=true){
+      state.running=false;state.sensorErrorKey=key;state.sensorFatal=fatal;clearTimeout(state.sensorTimeout);releaseWakeLock();syncSensorStartUI();updateSensorDependentControls();
+      els.stageStatus.className='stage-status warning';els.stageStatusText.textContent=t(key);
+      if(overlay)els.startOverlay.classList.remove('hidden');announce(t(key));
+    }
+
+    function renderMeter(){
+      const r=state.locked&&state.lockedReading?state.lockedReading:(state.display||state.current);if(!r)return;
+      els.sensorStage.classList.toggle('edge-mode',state.mode==='edge');
+      const levelValue=state.mode==='flat'?r.main:Math.abs(r.edge);const isLevel=levelValue<=state.tolerance&&(state.mode==='flat'||r.postureOk!==false);
+      els.sensorStage.classList.toggle('is-level',isLevel);els.sensorStage.classList.toggle('is-locked',state.locked);
+      if(state.mode==='flat'){
+        const scale=5.2,max=118;const bx=clamp(r.x*scale,-max,max),by=clamp(r.y*scale,-max,max);els.bubble.style.transform=`translate(calc(-50% + ${bx}px), calc(-50% + ${by}px))`;
+        els.mainReading.textContent=fmt(r.main);els.readingSub.textContent=`X ${fmt(r.x)}° / Y ${fmt(r.y)}°`;els.axisReadings.hidden=false;els.xReading.textContent=`${fmt(r.x)}°`;els.yReading.textContent=`${fmt(r.y)}°`;
+      }else{
+        const max=145;const px=clamp(r.edge*8,-max,max);els.edgeBubble.style.transform=`translate(calc(-50% + ${px}px), -50%)`;els.mainReading.textContent=fmt(Math.abs(r.edge));els.readingSub.textContent=r.postureOk===false?t('edgePosture'):`${r.edge>=0?'+':''}${fmt(r.edge)}° · ${fmt(r.slope)}%`;els.axisReadings.hidden=true;
+      }
+      els.slopeDisplay.textContent=`${fmt(r.slope)}%`;els.toleranceDisplay.textContent=`±${state.tolerance.toFixed(1)}°`;
+      const metric=stabilityMetric();els.stabilityDisplay.textContent=Number.isFinite(metric)?stabilityLabel(metric):'—';
+      els.referenceDisplay.textContent=hasCustomZero()?t('customZero'):t('factoryZero');
+      updateStatus(isLevel,metric,r);updateLevelFeedback(isLevel,metric);
+    }
+    function updateStatus(isLevel,metric,r){els.stageStatus.className='stage-status';let text;if(state.sensorErrorKey){text=t(state.sensorErrorKey);els.stageStatus.classList.add('warning')}else if(state.running&&!state.hasSensorData){text=t('sensorChecking');els.stageStatus.classList.add('warning')}else if(state.locked){text=t('sensorLocked');els.stageStatus.classList.add('stable')}else if(!state.hasSensorData){text=t('waiting')}else if(state.mode==='edge'&&r.postureOk===false){text=t('edgePosture');els.stageStatus.classList.add('warning')}else if(metric<.08){text=isLevel?t('levelNow'):t('sensorStable');els.stageStatus.classList.add('stable')}else{text=t('sensorMoving')};els.stageStatusText.textContent=text}
+    function updateLevelFeedback(isLevel,metric){const qualifies=isLevel&&metric<.1&&!state.locked;if(qualifies&&!state.lastLevelState){if(state.vibration&&navigator.vibrate)try{navigator.vibrate(35)}catch{}if(state.sound)beep()}state.lastLevelState=qualifies}
+    function beep(){try{if(!state.audioContext)state.audioContext=new (window.AudioContext||window.webkitAudioContext)();const ctx=state.audioContext;if(ctx.state==='suspended')ctx.resume();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.08,ctx.currentTime+.015);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.11);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.12)}catch{}}
+
+    function setMode(mode){if(mode!=='flat'&&mode!=='edge')return;state.mode=mode;state.samples=[];state.lastLevelState=false;els.flatModeButton.setAttribute('aria-selected',String(mode==='flat'));els.edgeModeButton.setAttribute('aria-selected',String(mode==='edge'));persist();if(state.gravity){state.current=calculate(state.gravity);if(!state.locked)state.display={...state.current}}renderMeter()}
+    function setZero(){if(!state.hasSensorData)return toast(t('sensorNoData'));const r=calculate(state.filteredGravity||state.gravity);if(state.mode==='flat'){state.zero.flatX+=r.x;state.zero.flatY+=r.y}else{state.zero.edge+=r.edge}state.locked=false;state.lockedReading=null;state.samples=[];persist();toast(t('zeroSet'));renderMeter()}
+    function hasCustomZero(){return Math.abs(state.zero.flatX)>.001||Math.abs(state.zero.flatY)>.001||Math.abs(state.zero.edge)>.001}
+    function resetZero(){state.zero={flatX:0,flatY:0,edge:0};state.locked=false;state.lockedReading=null;persist();if(state.gravity){state.current=calculate(state.gravity);state.display={...state.current}}toast(t('zeroReset'));renderMeter()}
+    function toggleHold(){if(!state.hasSensorData)return toast(t('sensorNoData'));state.locked=!state.locked;if(state.locked){state.lockedReading={...(state.display||state.current)};toast(t('locked'))}else{state.lockedReading=null;state.display={...state.current};toast(t('unlocked'))}els.holdButton.classList.toggle('active',state.locked);els.holdLabel.textContent=state.locked?t('resume'):t('hold');renderMeter()}
+
+    function startPrecision(){if(!state.hasSensorData){toast(t('sensorNoData'));return}closeDialog(els.settingsDialog);state.precision={started:performance.now(),samples:[],timer:null};state.locked=false;state.lockedReading=null;els.precisionProgress.classList.add('active');els.precisionProgress.querySelector('span').style.width='0%';announce(t('precisionRunning'));state.precision.timer=setInterval(()=>{if(!state.precision)return;const p=clamp((performance.now()-state.precision.started)/2000,0,1);els.precisionProgress.querySelector('span').style.width=`${p*100}%`;if(p>=1)finishPrecision()},80)}
+    function trackPrecision(r){if(!state.precision)return;state.precision.samples.push(state.mode==='flat'?{x:r.x,y:r.y}:{edge:r.edge,postureOk:r.postureOk})}
+    function finishPrecision(){const session=state.precision;if(!session)return;clearInterval(session.timer);state.precision=null;els.precisionProgress.classList.remove('active');const s=session.samples;if(s.length<8){toast(t('precisionFailed'));return}let result,spread;if(state.mode==='flat'){const mx=s.reduce((a,v)=>a+v.x,0)/s.length,my=s.reduce((a,v)=>a+v.y,0)/s.length;spread=Math.max(std(s.map(v=>v.x)),std(s.map(v=>v.y)));result={...state.current,x:mx,y:my,main:Math.hypot(mx,my),slope:Math.tan(rad(Math.hypot(mx,my)))*100}}else{const me=s.reduce((a,v)=>a+v.edge,0)/s.length;spread=std(s.map(v=>v.edge));result={...state.current,edge:me,main:Math.abs(me),slope:Math.tan(rad(Math.abs(me)))*100,postureOk:s.every(v=>v.postureOk!==false)}}state.locked=true;state.lockedReading=result;state.precisionResult={spread};els.holdButton.classList.add('active');els.holdLabel.textContent=t('resume');els.precisionSummary.textContent=t('precisionResult',{spread:fmt(spread,2)});toast(t('precisionDone'));renderMeter()}
+
+    function beginCalibration(){if(!state.hasSensorData){toast(t('sensorNoData'));return}state.calFirst=null;els.cal1Reading.textContent='';els.cal2Reading.textContent='';els.captureCal1.disabled=false;els.captureCal2.disabled=true;els.calStep1.classList.add('active');els.calStep2.classList.remove('active');openDialog(els.calibrationDialog)}
+    function collectRawFlat(duration=1100){return new Promise((resolve,reject)=>{if(!state.hasSensorData)return reject(new Error('no data'));const capture={samples:[],end:performance.now()+duration,resolve,reject};state.calibrationCapture=capture;setTimeout(()=>finishCalibrationCapture(capture),duration+80)})}
+    function trackCalibrationCapture(){const c=state.calibrationCapture;if(!c||!state.gravity)return;c.samples.push(rawFlatAngles(state.filteredGravity||state.gravity));if(performance.now()>=c.end)finishCalibrationCapture(c)}
+    function finishCalibrationCapture(c){if(state.calibrationCapture!==c)return;state.calibrationCapture=null;if(c.samples.length<6){c.reject(new Error('few samples'));return}const x=c.samples.reduce((a,v)=>a+v.x,0)/c.samples.length,y=c.samples.reduce((a,v)=>a+v.y,0)/c.samples.length;c.resolve({x,y})}
+    async function captureCal1(){els.captureCal1.disabled=true;els.cal1Reading.textContent=t('calCapture');try{state.calFirst=await collectRawFlat();els.cal1Reading.textContent=`X ${fmt(state.calFirst.x,2)}° / Y ${fmt(state.calFirst.y,2)}°`;els.captureCal2.disabled=false;els.calStep1.classList.remove('active');els.calStep2.classList.add('active');toast(t('calFirstDone'))}catch{els.cal1Reading.textContent=t('precisionFailed');els.captureCal1.disabled=false}}
+    async function captureCal2(){if(!state.calFirst)return;els.captureCal2.disabled=true;els.cal2Reading.textContent=t('calCapture');try{const second=await collectRawFlat();els.cal2Reading.textContent=`X ${fmt(second.x,2)}° / Y ${fmt(second.y,2)}°`;state.calibration={biasX:(state.calFirst.x+second.x)/2,biasY:(state.calFirst.y+second.y)/2,updatedAt:new Date().toISOString()};state.zero={flatX:0,flatY:0,edge:0};persist();if(state.gravity){state.current=calculate(state.gravity);state.display={...state.current}}updateSettingsUI();toast(t('calDone'));setTimeout(()=>closeDialog(els.calibrationDialog),450);renderMeter()}catch{els.cal2Reading.textContent=t('precisionFailed');els.captureCal2.disabled=false}}
+    async function resetCalibration(){const ok=await AppConfirm.ask({title:t('calResetTitle'),message:t('calResetMessage'),cancelLabel:t('cancel'),confirmLabel:t('reset'),tone:'danger'});if(!ok)return;state.calibration={biasX:0,biasY:0,updatedAt:null};persist();if(state.gravity){state.current=calculate(state.gravity);state.display={...state.current}}updateSettingsUI();toast(t('calReset'));renderMeter()}
+
+    async function requestWakeLock(){if(!state.running||!state.wakeEnabled||!('wakeLock'in navigator)||document.visibilityState!=='visible')return;try{if(state.wakeLock)return;state.wakeLock=await navigator.wakeLock.request('screen');state.wakeLock.addEventListener('release',()=>{state.wakeLock=null})}catch{state.wakeLock=null}}
+    async function releaseWakeLock(){try{await state.wakeLock?.release()}catch{}state.wakeLock=null}
+
+    function updateLanguage(){document.documentElement.lang=state.lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[state.lang][key]!==undefined)el.textContent=t(key)});els.languageButton.textContent=t('languageName');els.languageButton.setAttribute('aria-label',state.lang==='ja'?'Switch to English':'日本語に切り替え');els.helpButton.setAttribute('aria-label',t('helpTitle'));document.querySelectorAll('.dialog-close').forEach(b=>b.setAttribute('aria-label',t('close')));els.holdLabel.textContent=state.locked?t('resume'):t('hold');syncSensorStartUI();updateSettingsUI();renderMeter();persist()}
+    function updateSettingsUI(){document.querySelectorAll('#toleranceButtons button').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)===state.tolerance));els.vibrationToggle.checked=state.vibration;els.soundToggle.checked=state.sound;els.wakeLockToggle.checked=state.wakeEnabled;els.calibrationStatus.textContent=state.calibration.updatedAt?t('calibrated',{x:fmt(state.calibration.biasX,2),y:fmt(state.calibration.biasY,2)}):t('notCalibrated');els.resetCalibrationButton.disabled=!state.calibration.updatedAt;els.resetZeroButton.disabled=!hasCustomZero();els.precisionButton.disabled=!state.hasSensorData;els.calibrateButton.disabled=!state.hasSensorData;els.referenceDisplay.textContent=hasCustomZero()?t('customZero'):t('factoryZero')}
+    function openDialog(dialog){if(!dialog.open)dialog.showModal()}
+    function closeDialog(dialog){if(dialog?.open)dialog.close()}
+    function toast(message){els.toast.textContent=message;els.toast.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>els.toast.classList.remove('show'),2300);announce(message)}
+    function announce(message){els.ariaStatus.textContent='';requestAnimationFrame(()=>{els.ariaStatus.textContent=message})}
+    function handleBackdrop(event){if(event.target===event.currentTarget)event.currentTarget.close()}
+
+    const AppConfirm={ask({title,message,confirmLabel,cancelLabel,tone='default'}={}){return new Promise(resolve=>{const dialog=els.confirmDialog,prior=document.activeElement;els.confirmTitle.textContent=title||'Confirm';els.confirmMessage.textContent=message||'';els.confirmCancel.textContent=cancelLabel||t('cancel');els.confirmOk.textContent=confirmLabel||'OK';els.confirmOk.classList.toggle('danger',tone==='danger');let settled=false;const finish=value=>{if(settled)return;settled=true;cleanup();closeDialog(dialog);resolve(value);setTimeout(()=>prior?.focus?.({preventScroll:true}),0)};const onCancel=()=>finish(false),onOk=()=>finish(true),onDialogCancel=e=>{e.preventDefault();finish(false)},onClose=()=>finish(false),onBackdrop=e=>{const rect=dialog.getBoundingClientRect();const outside=e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom;if(outside)finish(false)};function cleanup(){els.confirmCancel.removeEventListener('click',onCancel);els.confirmOk.removeEventListener('click',onOk);els.confirmClose.removeEventListener('click',onCancel);dialog.removeEventListener('cancel',onDialogCancel);dialog.removeEventListener('close',onClose);dialog.removeEventListener('click',onBackdrop)}els.confirmCancel.addEventListener('click',onCancel);els.confirmOk.addEventListener('click',onOk);els.confirmClose.addEventListener('click',onCancel);dialog.addEventListener('cancel',onDialogCancel);dialog.addEventListener('close',onClose);dialog.addEventListener('click',onBackdrop);openDialog(dialog);setTimeout(()=>els.confirmCancel.focus({preventScroll:true}),0)})}};window.AppConfirm=Object.freeze(AppConfirm);
+
+    els.startButton.addEventListener('click',startSensors);
+    els.flatModeButton.addEventListener('click',()=>setMode('flat'));els.edgeModeButton.addEventListener('click',()=>setMode('edge'));
+    els.zeroButton.addEventListener('click',setZero);els.holdButton.addEventListener('click',toggleHold);els.settingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.helpButton.addEventListener('click',()=>openDialog(els.helpDialog));
+    els.languageButton.addEventListener('click',()=>{state.lang=state.lang==='ja'?'en':'ja';updateLanguage()});
+    document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>closeDialog(document.getElementById(btn.dataset.closeDialog))));[els.settingsDialog,els.calibrationDialog,els.helpDialog].forEach(d=>d.addEventListener('click',handleBackdrop));
+    els.toleranceButtons.addEventListener('click',e=>{const b=e.target.closest('button[data-value]');if(!b)return;state.tolerance=Number(b.dataset.value);persist();updateSettingsUI();renderMeter()});
+    els.vibrationToggle.addEventListener('change',()=>{state.vibration=els.vibrationToggle.checked;persist()});els.soundToggle.addEventListener('change',()=>{state.sound=els.soundToggle.checked;if(state.sound)beep();persist()});els.wakeLockToggle.addEventListener('change',()=>{state.wakeEnabled=els.wakeLockToggle.checked;persist();state.wakeEnabled?requestWakeLock():releaseWakeLock()});
+    els.precisionButton.addEventListener('click',startPrecision);els.calibrateButton.addEventListener('click',beginCalibration);els.captureCal1.addEventListener('click',captureCal1);els.captureCal2.addEventListener('click',captureCal2);els.resetCalibrationButton.addEventListener('click',resetCalibration);els.resetZeroButton.addEventListener('click',resetZero);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.wakeEnabled&&state.running)requestWakeLock()});window.addEventListener('pagehide',releaseWakeLock);
+
+    els.versionBadge.textContent=`v${config.version||'1.0'}`;setMode(state.mode);
+    const initialCapability=sensorCapability();if(!initialCapability.ok){state.sensorErrorKey=initialCapability.key;state.sensorFatal=true}
+    updateLanguage();updateSensorDependentControls();updateSettingsUI();renderMeter();
+    if(!('wakeLock'in navigator))els.wakeLockHelp.textContent=t('wakeUnavailable');
+    if(manifest.generatedAt)document.documentElement.dataset.build=manifest.generatedAt;
+  })();
+  </script>
+</body>
+</html>
