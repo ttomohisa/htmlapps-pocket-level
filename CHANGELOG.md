@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Japanese/English Settings choice of Angle (default) or Slope (%) as the primary reading, saved locally and applicable to held and averaged results.
+- Synthetic regression tests for sensor validity, primary readout behavior, and default/custom build output consistency across all release variants.
+
+### Fixed
+
+- Reject null, missing, and non-numeric orientation axes before conversion so unavailable sensors cannot create a false zero measurement. Numeric zero and the existing 500 ms motion preference remain valid.
+- Refresh the root `pocket-level.html` download during every build so it stays identical to the configured readable artifact.
+
 ## 1.0.0 - 2026-08-16
 
 ### Added

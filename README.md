@@ -22,7 +22,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 
 - **Surface mode** with a two-axis bullseye, X/Y angles, and combined tilt
 - **Edge / plumb mode** for checking a shelf edge, wall, post, or other one-axis surface
-- Degree and **slope %** display
+- Degree and **slope %** display, with a saved choice of the large primary reading in Settings
 - **Set zero** to use the current angle as a temporary reference
 - **Hold / Resume** to freeze a reading while moving the phone
 - Configurable level tolerance: ±0.1°, ±0.3°, ±0.5°, ±1.0°
@@ -69,6 +69,10 @@ Just [open the demo](https://ttomohisa.github.io/htmlapps-pocket-level/) on a sm
 4. Use **Set zero** when you want to measure relative to the current angle.
 5. Use **Hold** to keep a reading on screen while moving the phone.
 
+### Choose the primary reading
+
+In **Settings → Primary reading**, choose **Angle (°)** or **Slope (%)**. Angle is the default; the choice is saved on this device when local storage is available. Changing it also works while holding a reading or viewing a two-second average. Bubble movement, X/Y and signed edge angles, level tolerance, and calibration still use degrees. Very large finite slope readings use scientific notation in the primary display to fit narrow screens; the stored measurement is unchanged.
+
 ### Use the downloaded HTML
 
 `dist/index.html` is fully self-contained and the UI can be opened directly as a local file.
@@ -88,6 +92,8 @@ The start screen detects and reports common sensor problems, including:
 - motion / orientation permission denied
 - local `file://` pages that receive no sensor events
 - a browser or device that exposes the API but does not deliver usable orientation samples
+
+Orientation events with missing or non-finite beta/gamma values are ignored. Numeric zero is a valid sensor value; absent values are never converted to zero.
 
 When a fatal availability error is detected, **Start measuring** is disabled instead of leaving a non-working control active.
 
@@ -141,7 +147,7 @@ Each deployment rebuilds and verifies the generated files before publishing them
 build-standalone.bat
 ```
 
-Or run the repository check directly:
+Or run the repository check directly (requires Node.js 22 or later for the regression tests):
 
 ```powershell
 powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-repository.ps1
@@ -150,11 +156,14 @@ powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-
 Generated files include:
 
 - `dist/index.html`
+- `pocket-level.html` (the identical readable root download)
 - `dist/index.self-extract.html`
 - `dist/build-manifest.json`
 - `dist/dependency-manifest.json`
 
-Edit `src/index.template.html`, not the generated files in `dist/`.
+Edit `src/index.template.html`, not the generated files in `dist/` or `pocket-level.html`. The build refreshes the root download from the same rendered source even when `app.config.json` specifies a different readable output path.
+
+The repository check runs synthetic sensor and Settings-control regressions against the source, readable build, root download, and decompressed self-extract payload, plus default/custom build-path drift tests. No browser sensor permissions or physical devices are used by these tests. Real-phone HTTPS checks are still required to evaluate physical sensor accuracy and browser layout. PowerShell 7 can also run the check on Linux/macOS; set `PWSH_PATH` if its executable is not named `pwsh`.
 
 ## Privacy and runtime network protection
 
