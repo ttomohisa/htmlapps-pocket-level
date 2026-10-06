@@ -25,6 +25,7 @@ Users often need a spirit level only briefly and do not want to install a native
 - Surface mode with two-axis bullseye and X/Y angles.
 - Edge / plumb mode with one-axis bubble and angle.
 - Slope percentage derived from the active angle.
+- Settings choice of Angle (default) or Slope (%) for the primary readout, including held and averaged results; secondary angles and tolerance remain in degrees.
 - Adjustable level tolerance: 0.1°, 0.3°, 0.5°, 1.0°.
 - Stability indicator derived from recent sensor variance.
 - Temporary zero reference per measurement mode.
@@ -33,7 +34,7 @@ Users often need a spirit level only briefly and do not want to install a native
 - Screen Wake Lock when available and enabled.
 - 2-second average precision measurement that freezes the averaged result and reports spread.
 - 180° two-point surface calibration: record twice on the same surface after rotating the phone 180°, then estimate device-side X/Y bias with `(position1 + position2) / 2`.
-- Persist language, mode, tolerance, feedback settings, zero references, and calibration in localStorage when available.
+- Persist language, mode, valid primary readout preference, tolerance, feedback settings, zero references, and calibration in localStorage when available.
 - Japanese and English in the same HTML.
 - Light-only UI.
 
@@ -96,6 +97,7 @@ Users often need a spirit level only briefly and do not want to install a native
 
 ## Sensor availability behavior
 
+- Orientation fallback accepts only finite numeric beta/gamma values. Missing/null axes must not become a false zero reading; numeric zero is valid. Recent motion readings retain the existing 500 ms preference.
 - The meter must not present `0.0°` as a live measurement until at least one real motion/orientation sample has been received.
 - If the browser/device exposes neither Device Motion nor Device Orientation, disable the start button and explain that the environment is unsupported.
 - If the page is not a secure context, disable the start button and explain that HTTPS is required.
