@@ -9,6 +9,8 @@
 
 ### Fixed
 
+- Normalized the header language switch to EN / JA with localized target descriptions and Help tooltips; unified the Japanese local-processing badge wording (1.0.1).
+
 - Reject null, missing, and non-numeric orientation axes before conversion so unavailable sensors cannot create a false zero measurement. Numeric zero and the existing 500 ms motion preference remain valid.
 - Refresh the root `pocket-level.html` download during every build so it stays identical to the configured readable artifact.
 

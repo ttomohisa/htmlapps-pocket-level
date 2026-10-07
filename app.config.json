@@ -3,7 +3,7 @@
   "name": "Pocket Level",
   "nameJa": "Pocket Level",
   "slug": "pocket-level",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A privacy-friendly smartphone spirit level and inclinometer that runs entirely in the browser.",
   "descriptionJa": "スマホを水平器・傾斜計として使える、プライバシー重視のブラウザーアプリです。",
   "defaultLanguage": "auto",

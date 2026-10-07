@@ -68,7 +68,7 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
   const exposed = script.replace(/\}\)\(\);\s*$/, 'globalThis.testApi={state,attachSensorListeners,renderMeter};})();');
   if (exposed === script) throw Error('Application closure not found');
   vm.createContext(context); vm.runInContext(exposed, context); context.testApi.attachSensorListeners();
-  return { html, nodes: byId, state: context.testApi.state, storage, render: context.testApi.renderMeter,
+  return { html, nodes: byId, allNodes: nodes, document, state: context.testApi.state, storage, render: context.testApi.renderMeter,
     permissionCalls: () => permissionCalls,
     dispatch(type, event) { for (const fn of listeners.get(type) || []) fn(event); },
     motion(x, y, z) { this.dispatch('devicemotion', { accelerationIncludingGravity: { x, y, z } }); },
