@@ -11,7 +11,7 @@ $testFiles = @(Get-ChildItem -Path (Join-Path $Root 'tests/*.test.cjs') | ForEac
 if ($LASTEXITCODE -ne 0) { throw 'Application or build regression tests failed' }
 $previousHtml = $env:POCKET_LEVEL_HTML
 try {
-    $runtimeTests = @((Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'))
+    $runtimeTests = @((Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'))
     $artifacts = @($config.build.output, 'pocket-level.html')
     if ($config.build.selfExtract.enabled) { $artifacts += $config.build.selfExtract.output }
     foreach ($artifact in $artifacts) {

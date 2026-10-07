@@ -50,7 +50,7 @@ Users often need a spirit level only briefly and do not want to install a native
 - The primary screen exposes only mode switching, zero, hold, and settings.
 - Advanced calibration and precision averaging live in Settings to avoid clutter.
 - Smartphone layout should feel like a native measuring instrument, with large visual feedback and a thumb-friendly sticky control dock.
-- Header language and help controls are icon/text-only without filled backgrounds.
+- Header language and help controls are icon/text-only without filled backgrounds. Japanese UI shows `EN`; English UI shows `JA`. The language target and Help accessible name / tooltip use the current UI language. The Japanese local-processing badge reads `完全ローカル処理`.
 - No dark mode.
 
 ## 7. Browser / platform behavior
