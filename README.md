@@ -14,7 +14,7 @@ An install-free, privacy-focused **spirit level / inclinometer** for smartphones
 
 The page itself is delivered by GitHub Pages, but sensor readings, calibration, averaging, and display updates are processed locally on your device. Pocket Level has no runtime CDN, analytics, telemetry, account, or remote API.
 
-[![Pocket Level screenshot](assets/screenshot.png)](https://ttomohisa.github.io/htmlapps-pocket-level/)
+[![Pocket Level screenshot](assets/screenshot-en.png)](https://ttomohisa.github.io/htmlapps-pocket-level/)
 
 <img src="assets/screenshot-mobile.png" alt="Pocket Level mobile interface" width="320">
 
