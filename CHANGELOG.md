@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Clarify Japanese and English help by removing internal layout, implementation, and audit commentary while preserving usage guidance and cautions.
+
 ## 1.0.3 - 2026-10-11
 
 - Stop background page scrolling while a native modal dialog is open, preserving the existing dialog sizing, internal scrolling, and close behavior.
