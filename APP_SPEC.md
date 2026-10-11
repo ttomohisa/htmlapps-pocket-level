@@ -51,6 +51,8 @@ Users often need a spirit level only briefly and do not want to install a native
 - Advanced calibration and precision averaging live in Settings to avoid clutter.
 - Smartphone layout should feel like a native measuring instrument, with large visual feedback and a thumb-friendly sticky control dock.
 - Header language and help controls are icon/text-only without filled backgrounds. Japanese UI shows `EN`; English UI shows `JA`. The language target and Help accessible name / tooltip use the current UI language. The Japanese local-processing badge reads `完全ローカル処理`.
+- Native modal dialogs lock scrolling on both page roots until the last modal closes. Dialog content remains independently scrollable; existing sizing, close buttons, Esc, and backdrop behavior are retained. Non-modal open dialogs do not lock the page.
+- The existing local-processing badge uses a decorative inline SVG shield.
 - No dark mode.
 
 ## 7. Browser / platform behavior

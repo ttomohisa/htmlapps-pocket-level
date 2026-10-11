@@ -36,6 +36,10 @@ The CSP blocks runtime network connections with `connect-src 'none'`.
 
 The existing local-storage record stores `readout` as `angle` or `slope`, defaulting to `angle` for missing or invalid values. A native labeled Settings select changes only the displayed primary value and unit. Rendering selects the current or locked reading first, then uses its existing slope or angle. The primary slope uses scientific notation when its fixed-point text would exceed seven characters, keeping large finite averaged results readable without altering the stored number. It does not change measurement math, filtering, precision collection, zero references, calibration, bubble position, posture warnings, or degree-based tolerance.
 
+## Modal scrolling
+
+CSS `html:has(dialog:modal), body:has(dialog:modal)` locks only root overflow while at least one native modal is open. Closing the last modal releases it without JavaScript state or changes to the existing dialog geometry and handlers. The modal regression suite checks source/artifact CSS, bilingual Help, and shield markup; native scrolling and focus still require browser verification.
+
 ## Build consistency and tests
 
 Every build also writes `pocket-level.html` from the same rendered HTML as the configured readable output. The self-extract payload must decode to identical bytes. `scripts/check-repository.ps1` runs Node.js synthetic sensor/control tests against source and all three generated artifacts, plus isolated default/custom output-path build tests. These tests do not establish real-device accuracy.
