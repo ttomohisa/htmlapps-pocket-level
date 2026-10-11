@@ -32,6 +32,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - **2-second precision average** with measured spread
 - **180° two-point calibration** to estimate device-side X/Y sensor bias from two readings on the same surface
 - Sensor availability detection with clear error messages for unsupported, denied, insecure, or no-event states
+- Help and Settings keep the background page still while their content scrolls; close with the close button, Esc, or the backdrop.
 - Japanese and English UI in the same HTML
 - Smartphone-first layout with a bottom action bar for one-handed use
 - No third-party runtime library

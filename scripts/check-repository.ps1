@@ -7,11 +7,12 @@ $degreeToken = '180' + [char]0x00B0
 $required = @('Pocket Level','DeviceMotionEvent','DeviceOrientationEvent',$degreeToken,'APP:BEGIN','APP:END','APP:HELP:BEGIN','APP:HELP:END')
 foreach ($item in $required) { if (-not $html.Contains($item)) { throw "Required content missing: $item" } }
 $testFiles = @(Get-ChildItem -Path (Join-Path $Root 'tests/*.test.cjs') | ForEach-Object { $_.FullName })
-& node --test @testFiles
-if ($LASTEXITCODE -ne 0) { throw 'Application or build regression tests failed' }
 $previousHtml = $env:POCKET_LEVEL_HTML
 try {
-    $runtimeTests = @((Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'))
+    $env:POCKET_LEVEL_HTML = $null
+    & node --test @testFiles
+    if ($LASTEXITCODE -ne 0) { throw 'Application or build regression tests failed' }
+    $runtimeTests = @((Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'), (Join-Path $Root 'tests/modal-scroll.test.cjs'))
     $artifacts = @($config.build.output, 'pocket-level.html')
     if ($config.build.selfExtract.enabled) { $artifacts += $config.build.selfExtract.output }
     foreach ($artifact in $artifacts) {
