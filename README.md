@@ -23,7 +23,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - **Surface mode** with a two-axis bullseye, X/Y angles, and combined tilt
 - **Edge / plumb mode** for checking a shelf edge, wall, post, or other one-axis surface
 - Degree and **slope %** display, with a saved choice of the large primary reading in Settings
-- **Set zero** to use the current angle as a temporary reference
+- **Set zero** to save the current angle as a reference
 - **Hold / Resume** to freeze a reading while moving the phone
 - **Capture when stable**: place the phone and release your hand; a fresh, steady reading is held automatically
 - The active mode’s absolute/saved-angle reference is shown beside the reading with a quick reset

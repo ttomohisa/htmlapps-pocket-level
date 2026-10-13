@@ -17,7 +17,7 @@ Users often need a spirit level only briefly and do not want to install a native
 2. Tap **Start measuring** and grant motion-sensor permission if requested.
 3. Choose **Surface** or **Edge / plumb**.
 4. Place the phone on the surface or against an edge and read the bubble / angle.
-5. Optionally set a temporary zero reference or hold a reading.
+5. Optionally save a zero reference or hold a reading.
 6. Open Settings only when tolerance, feedback, precision averaging, or calibration is needed.
 
 ## 4. Functional requirements

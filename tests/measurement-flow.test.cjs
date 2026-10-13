@@ -104,3 +104,7 @@ test('old calibration completion cannot close a newly reopened capture',async()=
  const h=createHarness();h.motion(0,0,1);click(h,'calibrateButton');click(h,'captureCal1');steady(h,0,0,1,12);await Promise.resolve();click(h,'captureCal2');steady(h,0,0,1,12);await Promise.resolve();
  h.nodes.get('calibrationDialog').close();click(h,'calibrateButton');click(h,'captureCal1');h.advance(500);assert.equal(h.nodes.get('calibrationDialog').open,true);assert(h.state.calibrationCapture);
 });
+test('Settings reset guidance describes the persisted current-mode reference in both languages',()=>{
+ const h=createHarness();const help=()=>h.allNodes.find(n=>n.dataset.i18n==='resetReferenceHelp').textContent;
+ assert.equal(help(),'Return to the default reference for the current mode.');h.nodes.get('languageButton').click();assert.equal(help(),'現在のモードで保存したゼロ基準を標準に戻します。');
+});
