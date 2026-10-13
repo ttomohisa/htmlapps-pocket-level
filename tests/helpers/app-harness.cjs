@@ -43,6 +43,7 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
     for (const attr of match[2].matchAll(/([\w-]+)(?:="([^"]*)")?/g)) attributes[attr[1]] = attr[2] ?? '';
     const el = new Element(match[1], attributes); nodes.push(el); if (el.id) byId.set(el.id, el);
   }
+  const documentListeners = new Map();
   const document = { documentElement: { lang: language, dataset: {} }, visibilityState: 'visible', activeElement: null,
     querySelectorAll(selector) {
       if (selector === '[id]') return nodes.filter(n => n.id);
@@ -51,7 +52,7 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
       if (selector === '.dialog-close') return nodes.filter(n => n.classList.contains('dialog-close'));
       if (selector === '#toleranceButtons button') return nodes.filter(n => n.tagName === 'BUTTON' && n.dataset.value);
       throw Error(`Unexpected selector in test harness: ${selector}`);
-    }, getElementById: id => byId.get(id), addEventListener() {} };
+    }, getElementById: id => byId.get(id), addEventListener(type, fn) { if (!documentListeners.has(type)) documentListeners.set(type, []); documentListeners.get(type).push(fn); }, dispatch(type) { for (const fn of documentListeners.get(type) || []) fn(); } };
   for (const match of html.matchAll(/<script[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/script>/g)) byId.get(match[1]).textContent = match[2];
   function Sensor() {}
   Sensor.requestPermission = () => { permissionCalls++; throw Error('Actual permission path must not run in these tests'); };
@@ -78,3 +79,4 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
     text(id) { return byId.get(id)?.textContent; }, stored() { return JSON.parse(storage.get('pocket-level:v1') || '{}'); } };
 }
 module.exports = { createHarness, loadHtml };
+

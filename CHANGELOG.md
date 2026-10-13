@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 - 2026-10-13
+
+- Prioritize the measuring display on phones and place the existing 2-second average beside Hold.
+- Show the active mode's absolute or saved-angle reference beside the main value, with a nearby reset.
+- Add user-armed capture after placement and one second of fresh stable readings, with cancellation and a 15-second timeout.
+- Calculate true Surface inclination and reference separation from gravity vectors; average vectors consistently and show unavailable slope at 90 degrees or beyond.
+- Preserve Edge contact-line references across axis changes. Old ambiguous Edge offsets reset once with a notice; compatible Surface references and calibration remain.
+- Cancel interrupted captures and guard calibration posture, stale samples, and calibration-reference resets.
+- Add synthetic geometry, capture, migration, and interruption regressions across release artifacts. Physical phone accuracy still requires real-device verification.
+
 ## Unreleased
 
 - Clarify Japanese and English help by removing internal layout, implementation, and audit commentary while preserving usage guidance and cautions.
@@ -49,3 +59,4 @@
 ### Fixed
 
 - Made the repository content check ASCII-safe so Windows PowerShell 5.1 does not misread the `180°` verification token.
+

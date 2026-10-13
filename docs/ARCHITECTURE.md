@@ -34,7 +34,7 @@ The CSP blocks runtime network connections with `connect-src 'none'`.
 
 ## Primary readout
 
-The existing local-storage record stores `readout` as `angle` or `slope`, defaulting to `angle` for missing or invalid values. A native labeled Settings select changes only the displayed primary value and unit. Rendering selects the current or locked reading first, then uses its existing slope or angle. The primary slope uses scientific notation when its fixed-point text would exceed seven characters, keeping large finite averaged results readable without altering the stored number. It does not change measurement math, filtering, precision collection, zero references, calibration, bubble position, posture warnings, or degree-based tolerance.
+The existing local-storage record stores `readout` as `angle` or `slope`, defaulting to `angle` for missing or invalid values. A native labeled Settings select changes only the displayed primary value and unit. Rendering selects the current or locked reading first, then uses its existing slope or angle. The primary slope uses scientific notation for large finite values. One shared helper returns unavailable slope at or above 90 degrees for live, held, averaged, and automatic-capture results. It does not change measurement math, filtering, precision collection, zero references, calibration, bubble position, posture warnings, or degree-based tolerance.
 
 ## Modal scrolling
 
@@ -55,3 +55,16 @@ The optional two-point calibration records the raw Surface X/Y angle twice on th
 - `__APP_CONFIG_JSON__`
 - `__BUILD_MANIFEST_JSON__`
 - `__EMBEDDED_ASSET_BUNDLE_BASE64__`
+
+
+## Measurement geometry and reference compatibility
+
+Surface calibration retains additive `asin(g.x)` / `asin(g.y)` degree units. Corrected component angles are reconstructed into a screen-up unit vector only when physically feasible. The total is the vector angle to the reference, computed with cross-product magnitude and dot product; X/Y chips retain component-angle differences. Legacy Surface zeros are already corrected component angles and are reconstructed without subtracting calibration twice. Invalid correction/reference pairs display an unavailable reading instead of a fabricated angle.
+
+Surface averaging normalizes the mean corrected vector and evaluates it once against the capture's reference. Edge uses an undirected contact line: `zero.edgeRoll` stores in-plane roll and reference differences have period 180 degrees. Edge averaging uses doubled-angle vectors; near-zero resultants are rejected. Default Edge still reports nearest level/plumb deviation. Legacy nonzero folded Edge offsets cannot identify the contact line; they reset once with a notice while other settings persist. Calibration reset clears references expressed in its prior coordinates.
+
+## Capture lifecycle
+
+Both capture types freeze their mode/reference and are cancelled when those change. Automatic capture is explicitly armed, allows 1000 ms for placement, then requires at least 1000 ms and eight fresh samples with angular RMS below 0.08 degrees and maximum deviation at most 0.15 degrees. Gaps above 500 ms reset its stable window; 15000 ms ends an unsuccessful attempt. It uses unsmoothed incoming geometry so smoothing cannot hide movement. Screen hiding, page exit, manual Hold, and calibration interrupt collection. Calibration capture retains arithmetic raw-component averaging, rejects face-down/stale capture, and uses a generation token to prevent a cancelled dialog from later saving.
+
+These thresholds express repeatability, not device accuracy. Sensor permissions, physical contact, platform behavior, and accuracy require real-phone HTTPS testing.
