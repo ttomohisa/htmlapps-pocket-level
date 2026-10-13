@@ -108,3 +108,13 @@ test('Settings reset guidance describes the persisted current-mode reference in 
  const h=createHarness();const help=()=>h.allNodes.find(n=>n.dataset.i18n==='resetReferenceHelp').textContent;
  assert.equal(help(),'Return to the default reference for the current mode.');h.nodes.get('languageButton').click();assert.equal(help(),'現在のモードで保存したゼロ基準を標準に戻します。');
 });
+test('Settings gear is centered, symmetric, inside its viewBox, and retains its label/action',()=>{
+ const h=createHarness();const button=h.html.match(/<button[^>]*id="settingsButton"[^>]*>([\s\S]*?)<\/button>/)[1];
+ assert.match(button,/<svg[^>]*viewBox="0 0 24 24"[^>]*aria-hidden="true"/);assert.doesNotMatch(button,/transform=/);
+ assert.match(button,/<circle cx="12" cy="12" r="3"/);assert.match(button,/data-i18n="settings"/);
+ const points=[...button.match(/<path d="([^"]+)"/)[1].matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map(m=>[Number(m[1]),Number(m[2])]);
+ assert.equal(points.length,32);for(const [x,y] of points){assert(x>=1&&x<=23&&y>=1&&y<=23);assert(points.some(([a,b])=>Math.abs(a-(24-x))<.002&&Math.abs(b-(24-y))<.002),'opposite point');assert(points.some(([a,b])=>Math.abs(a-(24-y))<.002&&Math.abs(b-x)<.002),'quarter-turn symmetry');}
+ assert.match(button,/stroke-width="1.8"/);assert.match(button,/stroke-linejoin="round"/);
+ click(h,'settingsButton');assert.equal(h.nodes.get('settingsDialog').open,true);
+ for(const lang of ['en','ja']){if(h.state.lang!==lang)click(h,'languageButton');assert.equal(h.allNodes.find(n=>n.dataset.i18n==='settings').textContent,lang==='en'?'Settings':'設定');}
+});
