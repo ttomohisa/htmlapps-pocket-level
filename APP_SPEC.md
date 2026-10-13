@@ -28,7 +28,8 @@ Users often need a spirit level only briefly and do not want to install a native
 - Settings choice of Angle (default) or Slope (%) for the primary readout, including held and averaged results; secondary angles and tolerance remain in degrees.
 - Adjustable level tolerance: 0.1°, 0.3°, 0.5°, 1.0°.
 - Stability indicator derived from recent sensor variance.
-- Temporary zero reference per measurement mode.
+- Locally saved reference per measurement mode, labeled beside the main reading with a current-mode reset.
+- User-armed automatic stable capture with placement time, cancellation, freshness checks, and timeout.
 - Hold / resume current reading.
 - Optional vibration and generated tone when entering the level tolerance while stable.
 - Screen Wake Lock when available and enabled.
@@ -47,8 +48,8 @@ Users often need a spirit level only briefly and do not want to install a native
 
 ## 6. UX decisions
 
-- The primary screen exposes only mode switching, zero, hold, and settings.
-- Advanced calibration and precision averaging live in Settings to avoid clutter.
+- The primary screen exposes mode switching, the current reference, zero, Hold, 2-second average, automatic capture, and Settings. The active phone layout reduces introductory text.
+- Advanced calibration stays in Settings; the existing average is also available beside Hold.
 - Smartphone layout should feel like a native measuring instrument, with large visual feedback and a thumb-friendly sticky control dock.
 - Header language and help controls are icon/text-only without filled backgrounds. Japanese UI shows `EN`; English UI shows `JA`. The language target and Help accessible name / tooltip use the current UI language. The Japanese local-processing badge reads `完全ローカル処理`.
 - Native modal dialogs lock scrolling on both page roots until the last modal closes. Dialog content remains independently scrollable; existing sizing, close buttons, Esc, and backdrop behavior are retained. Non-modal open dialogs do not lock the page.
@@ -108,3 +109,7 @@ Users often need a spirit level only briefly and do not want to install a native
 - For `file://` with no sensor events, explicitly explain that the local HTML opening method is not supported by that browser and recommend the HTTPS-hosted version.
 - Sensor-dependent actions such as Set zero, Hold, precision averaging, and calibration remain disabled until real sensor data is available.
 - The static HTML may still open through `file://`, but sensor measurement itself is browser-dependent and is only a guaranteed target when served from a supported secure context.
+
+
+- Surface inclination/reference separation uses corrected unit vectors; averaged and live slope share unavailable handling at 90 degrees or beyond.
+- Edge saved references retain an undirected contact-line angle. Ambiguous legacy Edge zeros reset once with a notice; compatible Surface calibration/reference data is preserved.

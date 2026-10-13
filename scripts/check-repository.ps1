@@ -12,7 +12,7 @@ try {
     $env:POCKET_LEVEL_HTML = $null
     & node --test @testFiles
     if ($LASTEXITCODE -ne 0) { throw 'Application or build regression tests failed' }
-    $runtimeTests = @((Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'), (Join-Path $Root 'tests/modal-scroll.test.cjs'))
+    $runtimeTests = @((Join-Path $Root 'tests/measurement-flow.test.cjs'), (Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'), (Join-Path $Root 'tests/modal-scroll.test.cjs'))
     $artifacts = @($config.build.output, 'pocket-level.html')
     if ($config.build.selfExtract.enabled) { $artifacts += $config.build.selfExtract.output }
     foreach ($artifact in $artifacts) {
@@ -27,3 +27,4 @@ Write-Host 'Repository checks passed' -ForegroundColor Green
 # Keep internal QA/implementation prose out of user-facing help.
 & node (Join-Path $Root "tests/help-copy.test.cjs")
 if ($LASTEXITCODE -ne 0) { throw "User-facing help copy regression failed." }
+

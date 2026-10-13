@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createHarness } = require('./helpers/app-harness.cjs');
 const clone = value => JSON.parse(JSON.stringify(value));
-const formatted = value => (Math.abs(value) < .05 ? 0 : value).toFixed(1);
+const formatted = value => !Number.isFinite(value) ? '—' : (Math.abs(value) < .05 ? 0 : value).toFixed(1);
 function measurement(h) {
   return JSON.stringify({ current: h.state.current, display: h.state.display, locked: h.state.locked, held: h.state.lockedReading, samples: h.state.samples, gravity: h.state.gravity, zero: h.state.zero, calibration: h.state.calibration, tolerance: h.state.tolerance, precision: h.state.precision, source: h.state.source });
 }
@@ -57,7 +57,7 @@ test('invalid control values do not replace the last valid preference', () => {
   assert.equal(h.state.readout, 'slope'); assert.equal(h.stored().readout, 'slope'); assert.equal(h.nodes.get('primaryReadoutSelect').value, 'slope');
 });
 test('saved readout restores without changing zero, calibration, mode or feedback preferences', () => {
-  const saved = { lang: 'en', mode: 'edge', readout: 'angle', tolerance: .5, vibration: false, sound: false, wakeEnabled: false, zero: { flatX: 1, flatY: -2, edge: 3 }, calibration: { biasX: .2, biasY: -.3, updatedAt: '2026-10-01T00:00:00.000Z' } };
+  const saved = { lang: 'en', mode: 'edge', readout: 'angle', tolerance: .5, vibration: false, sound: false, wakeEnabled: false, zero: { flatX: 1, flatY: -2, edge: 0, edgeRoll: 3 }, calibration: { biasX: .2, biasY: -.3, updatedAt: '2026-10-01T00:00:00.000Z' } };
   const h = createHarness({ stored: saved }); h.preference('slope');
   assert.deepEqual(h.stored(), { ...saved, readout: 'slope' });
   const reloaded = createHarness({ stored: h.stored() }); assert.equal(reloaded.state.readout, 'slope'); assert.deepEqual(reloaded.stored(), h.stored());
@@ -80,8 +80,8 @@ test('Hold keeps its captured reading when switching units; Resume returns to th
 test('two-second averaging can change display units while collecting and uses the frozen result afterward', () => {
   const h = createHarness(); h.motion(1, 0, 10); h.nodes.get('precisionButton').click();
   const session = h.state.precision; h.preference('slope'); assert.equal(h.state.precision, session);
-  for (let i = 0; i < 12; i++) { h.advance(100); h.motion(1 + i / 20, 0, 10); }
-  h.advance(800); assert.equal(h.state.locked, true); assert.equal(h.state.precision, null);
+  for (let i = 0; i < 18; i++) { h.advance(100); h.motion(1 + i / 20, 0, 10); }
+  h.advance(200); assert.equal(h.state.locked, true); assert.equal(h.state.precision, null);
   const held = clone(h.state.lockedReading); assert.equal(h.text('mainReading'), formatted(held.slope));
   h.motion(8, 0, 10); h.preference('angle'); assert.equal(h.text('mainReading'), formatted(held.main));
   h.preference('slope'); assert.equal(h.text('mainReading'), formatted(held.slope)); assert.deepEqual(clone(h.state.lockedReading), held);
@@ -108,20 +108,18 @@ test('zero/reset zero and calibration continue using degrees with the selected d
   assert.deepEqual(clone(h.state.zero), { flatX: 0, flatY: 0, edge: 0 }); assert.deepEqual(clone(h.state.calibration), calibration);
   assert.equal(h.state.readout, 'slope'); assert.equal(h.text('mainReading'), formatted(h.state.current.slope));
 });
-test('large slope retains the existing capped slope value and non-finite formatting', () => {
+test('vertical slope is unavailable rather than a capped finite measurement', () => {
   const h = createHarness(); h.motion(1, 0, 0); h.preference('slope');
-  assert.equal(h.text('mainReading'), '5729.0'); assert.equal(h.text('mainReadingUnit'), '%');
-  h.state.locked = true; h.state.lockedReading = { ...h.state.current, slope: Infinity }; h.render();
+  assert.equal(h.state.current.main, 90); assert.equal(h.state.current.slope, null);
   assert.equal(h.text('mainReading'), '—'); assert.equal(h.text('slopeDisplay'), '—%');
+  assert.match(h.text('stageStatusText'), /90°/);
 });
-test('a near-vertical averaged slope uses compact primary text without changing the frozen measurement', () => {
+test('a vertical average preserves unavailable slope through primary-unit changes', () => {
   const h = createHarness(); h.motion(1, 0, 0); h.preference('slope'); h.nodes.get('precisionButton').click();
-  for (let i = 0; i < 12; i++) { h.advance(100); h.motion(1, 0, 0); }
-  h.advance(800);
-  const held = clone(h.state.lockedReading);
-  assert.equal(held.main, 90); assert.equal(held.slope, Math.tan(Math.PI / 2) * 100);
-  assert.equal(h.text('mainReading'), '1.6e+18'); assert.equal(h.text('mainReadingUnit'), '%');
-  assert.equal(h.text('slopeDisplay'), `${formatted(held.slope)}%`);
+  for (let i = 0; i < 18; i++) { h.advance(100); h.motion(1, 0, 0); }
+  h.advance(200); const held = clone(h.state.lockedReading);
+  assert.equal(held.main, 90); assert.equal(held.slope, null);
+  assert.equal(h.text('mainReading'), '—'); assert.equal(h.text('mainReadingUnit'), '%');
   h.preference('angle'); assert.equal(h.text('mainReading'), '90.0');
-  h.preference('slope'); assert.equal(h.text('mainReading'), '1.6e+18'); assert.deepEqual(clone(h.state.lockedReading), held);
+  h.preference('slope'); assert.equal(h.text('mainReading'), '—'); assert.deepEqual(clone(h.state.lockedReading), held);
 });

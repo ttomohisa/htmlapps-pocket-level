@@ -25,6 +25,8 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - Degree and **slope %** display, with a saved choice of the large primary reading in Settings
 - **Set zero** to use the current angle as a temporary reference
 - **Hold / Resume** to freeze a reading while moving the phone
+- **Capture when stable**: place the phone and release your hand; a fresh, steady reading is held automatically
+- The active mode’s absolute/saved-angle reference is shown beside the reading with a quick reset
 - Configurable level tolerance: ±0.1°, ±0.3°, ±0.5°, ±1.0°
 - **Stability indicator** based on recent sensor variance
 - Optional sound and vibration when a stable reading enters the level zone
@@ -72,7 +74,7 @@ Just [open the demo](https://ttomohisa.github.io/htmlapps-pocket-level/) on a sm
 
 ### Choose the primary reading
 
-In **Settings → Primary reading**, choose **Angle (°)** or **Slope (%)**. Angle is the default; the choice is saved on this device when local storage is available. Changing it also works while holding a reading or viewing a two-second average. Bubble movement, X/Y and signed edge angles, level tolerance, and calibration still use degrees. Very large finite slope readings use scientific notation in the primary display to fit narrow screens; the stored measurement is unchanged.
+In **Settings → Primary reading**, choose **Angle (°)** or **Slope (%)**. Angle is the default; the choice is saved on this device when local storage is available. Changing it also works while holding a reading or viewing a two-second average. Bubble movement, X/Y and signed edge angles, level tolerance, and calibration still use degrees. Slope is unavailable at 90° or beyond and displays “—” in both live and averaged readings.
 
 ### Use the downloaded HTML
 
@@ -102,7 +104,17 @@ When a fatal availability error is detected, **Start measuring** is disabled ins
 
 ### 2-second average
 
-Pocket Level can collect sensor readings for two seconds, average them, and report the spread. This is useful when small hand movements make a single instantaneous reading hard to judge.
+Use **2s average** beside Hold (or in Settings) to collect sensor readings for two seconds, average them, and report the spread. This is useful when small hand movements make a single instantaneous reading hard to judge.
+
+### Capture when stable
+
+Tap **Capture when stable**, put the phone in position, and take your hand away. After a one-second placement interval, the app waits for at least one second of fresh, stable readings. It holds the result once, or stops after 15 seconds without a stable result. You can cancel at any time. Changing mode/reference or leaving the page interrupts capture. Stability indicates repeatability, not certified accuracy.
+
+### Saved-angle references
+
+The reference label and nearby reset apply to the current mode. Surface compares gravity directions; keep the same phone heading and contact face when comparing. Edge compares the saved contact line, including when it crosses the nearest horizontal/vertical axis. The reference stays saved on this device until reset.
+
+Older Edge references did not retain the contact direction and cannot be reconstructed safely. On upgrade, only those ambiguous Edge references reset once, with a notice. Compatible Surface references and two-point calibration are retained. Resetting calibration also resets references that used it.
 
 ### 180° two-point calibration
 
@@ -203,3 +215,4 @@ Bug reports and feature proposals are welcome through GitHub Issues. See [CONTRI
 Copyright © 2026 ttomohisa
 
 Licensed under the [MIT License](LICENSE).
+
