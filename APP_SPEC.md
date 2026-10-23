@@ -115,3 +115,5 @@ Users often need a spirit level only briefly and do not want to install a native
 - Edge saved references retain an undirected contact-line angle. Ambiguous legacy Edge zeros reset once with a notice; compatible Surface calibration/reference data is preserved.
 
 - Hide only the informational footer at the existing 760px measuring-dock breakpoint, retaining the dock and safe-area clearance. The English equivalent of 完全ローカル処理 is Fully local processing; retain existing mobile badge hiding and sensor behavior.
+
+- Keep the Help header fixed within its existing bounded dialog and let only its body shrink and scroll, so the final English/Japanese guidance stays reachable at desktop and phone sizes. Other dialogs retain their existing layout.

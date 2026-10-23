@@ -135,6 +135,9 @@
     .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:70;max-width:min(420px,calc(100vw - 28px));padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow-md);opacity:0;transform:translate(-50%,12px);pointer-events:none;transition:opacity .18s ease,transform .18s ease;font-size:12px}.toast.show{opacity:1;transform:translate(-50%,0)}
     .confirm-dialog{width:min(440px,calc(100% - 28px))}.confirm-dialog .dialog-body{padding-bottom:18px}.confirm-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 20px 20px}.confirm-actions .button{min-width:92px}
     .unsupported{color:var(--warn);font-weight:700}
+    #helpDialog[open]{display:flex;flex-direction:column}
+    #helpDialog .dialog-header{flex:0 0 auto}
+    #helpDialog .dialog-body{flex:1 1 auto;min-height:0;max-height:none}
     @media(max-width:760px){
       footer{display:none}
       .main{padding-top:12px;padding-bottom:112px}.page-intro{padding-bottom:10px}.page-intro p{font-size:12px}.privacy-badge{display:none}

@@ -52,7 +52,7 @@ async function main() {
   const browser = await chromium.launch();
   try {
     const cases = [];
-    for (const language of ['ja','en']) for (const [width,height] of [[1360,900],[cfg.phone+1,568],[cfg.phone,568],[320,568],[393,252]]) cases.push({file:'dist/index.html',language,width,height});
+    for (const language of ['ja','en']) for (const [width,height] of [[1360,900],[cfg.phone+1,568],[cfg.phone,568],[561,568],[560,568],[320,568],[393,252]]) cases.push({file:'dist/index.html',language,width,height});
     cases.push({file:'dist/index.self-extract.html',language:'en',width:360,height:640});
     cases.push({file:cfg.slug+'.html',language:'ja',width:1360,height:900});
     for (const {file,language,width,height} of cases) {
