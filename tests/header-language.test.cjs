@@ -18,7 +18,7 @@ function assertHeader(h, language) {
   const close = h.allNodes.find(node => node.dataset.closeDialog === 'helpDialog');
   assert.equal(close.getAttribute('aria-label'), language === 'ja' ? '閉じる' : 'Close');
   assert.equal(h.allNodes.find(node => node.dataset.i18n === 'localOnly').textContent,
-    language === 'ja' ? '完全ローカル処理' : 'Processed on device');
+    language === 'ja' ? '完全ローカル処理' : 'Fully local processing');
   assert.equal(h.permissionCalls(), 0);
 }
 

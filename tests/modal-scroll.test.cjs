@@ -39,7 +39,8 @@ test('ordinary pages and non-modal open dialogs do not receive a root lock', () 
 });
 test('existing bounded dialog and independently scrolling body geometry is unchanged', () => {
   assert.deepEqual([...css.matchAll(/(?<![\w.-])dialog\s*\{([^}]+)\}/g)].map(match => compact(match[1])), ["width:min(600px,calc(100%-28px));max-height:min(760px,calc(100dvh-28px));padding:0;overflow:hidden;border:1pxsolidvar(--line);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:var(--shadow-md)", "width:100%;max-width:none;max-height:min(86dvh,760px);margin:auto00;border-radius:20px20px00;border-bottom:0"]);
-  assert.deepEqual([...css.matchAll(/\.dialog\-body\s*\{([^}]+)\}/g)].map(match => compact(match[1])), ["padding:18px20pxcalc(22px+env(safe-area-inset-bottom));overflow:auto;max-height:calc(100dvh-78px)", "padding-bottom:18px", "max-height:calc(86dvh-70px)"]);
+  const baselineCss = css.replace(/#helpDialog \.dialog-body\{[^}]*\}/g, ''); // Scoped Help override is asserted below.
+  assert.deepEqual([...baselineCss.matchAll(/\.dialog\-body\s*\{([^}]+)\}/g)].map(match => compact(match[1])), ["padding:18px20pxcalc(22px+env(safe-area-inset-bottom));overflow:auto;max-height:calc(100dvh-78px)", "padding-bottom:18px", "max-height:calc(86dvh-70px)"]);
 });
 test('existing privacy badge uses a decorative shield without changing its wording', () => {
   const badge = html.match(/<div class="privacy-badge">([\s\S]*?)<\/div>/)?.[1];
@@ -68,4 +69,19 @@ test('canonical runner includes source and artifact regression checks with failu
   assert.match(runner, /tests\/modal-scroll\.test\.cjs/);
   assert.match(runner, /foreach \(\$artifact in \$artifacts\)[\s\S]*& node --test[\s\S]*if \(\$LASTEXITCODE -ne 0\) \{ throw/);
   assert.match(runner, /finally\s*\{[\s\S]*\$env:POCKET_LEVEL_HTML\s*=\s*\$previousHtml/);
+});
+
+
+test('phone footer hides at the existing dock breakpoint without hiding controls', () => {
+  const mobile = css.match(/@media\(max-width:760px\)\{([\s\S]*?)@media\(max-width:560px\)/)[1];
+  assert.match(mobile, /footer\{display:none\}/);
+  assert.match(mobile, /\.control-dock\{position:fixed;/);
+  assert.match(mobile, /padding-bottom:112px/);
+  assert.match(mobile, /\.privacy-badge\{display:none\}/);
+});
+
+test('Help flexes only its scrolling body inside the existing outer bounds', () => {
+  assert.match(css, /#helpDialog\[open\]\{display:flex;flex-direction:column\}/);
+  assert.match(css, /#helpDialog \.dialog-header\{flex:0 0 auto\}/);
+  assert.match(css, /#helpDialog \.dialog-body\{flex:1 1 auto;min-height:0;max-height:none\}/);
 });
