@@ -113,3 +113,5 @@ Users often need a spirit level only briefly and do not want to install a native
 
 - Surface inclination/reference separation uses corrected unit vectors; averaged and live slope share unavailable handling at 90 degrees or beyond.
 - Edge saved references retain an undirected contact-line angle. Ambiguous legacy Edge zeros reset once with a notice; compatible Surface calibration/reference data is preserved.
+
+- Hide only the informational footer at the existing 760px measuring-dock breakpoint, retaining the dock and safe-area clearance. The English equivalent of 完全ローカル処理 is Fully local processing; retain existing mobile badge hiding and sensor behavior.

@@ -12,6 +12,8 @@
 
 ## Unreleased
 
+- Hide the informational footer in the existing phone measuring layout and standardize the English local-processing badge, preserving the dock, sensor behavior, and mobile badge hiding.
+
 - Clarify Japanese and English help by removing internal layout, implementation, and audit commentary while preserving usage guidance and cautions.
 
 ## 1.0.3 - 2026-10-11

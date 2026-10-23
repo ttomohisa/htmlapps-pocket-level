@@ -69,3 +69,12 @@ test('canonical runner includes source and artifact regression checks with failu
   assert.match(runner, /foreach \(\$artifact in \$artifacts\)[\s\S]*& node --test[\s\S]*if \(\$LASTEXITCODE -ne 0\) \{ throw/);
   assert.match(runner, /finally\s*\{[\s\S]*\$env:POCKET_LEVEL_HTML\s*=\s*\$previousHtml/);
 });
+
+
+test('phone footer hides at the existing dock breakpoint without hiding controls', () => {
+  const mobile = css.match(/@media\(max-width:760px\)\{([\s\S]*?)@media\(max-width:560px\)/)[1];
+  assert.match(mobile, /footer\{display:none\}/);
+  assert.match(mobile, /\.control-dock\{position:fixed;/);
+  assert.match(mobile, /padding-bottom:112px/);
+  assert.match(mobile, /\.privacy-badge\{display:none\}/);
+});
