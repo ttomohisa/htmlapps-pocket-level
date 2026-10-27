@@ -10,10 +10,11 @@ function loadHtml(file = process.env.POCKET_LEVEL_HTML || path.join(__dirname, '
   const payload = html.match(/const b='([^']+)'/);
   return payload ? gunzipSync(Buffer.from(payload[1], 'base64')).toString('utf8') : html;
 }
-function createHarness({ stored, storageUnavailable = false, language = 'en' } = {}) {
+function createHarness({ stored, storageUnavailable = false, language = 'en',sharedLanguage=null,url='https://example.test/' } = {}) {
   const html = loadHtml();
   let now = 1000, nextTimer = 0, permissionCalls = 0;
   const timers = new Map(), storage = new Map(), nodes = [], byId = new Map(), listeners = new Map();
+  if(sharedLanguage)storage.set('browser-kitty:ui-language:v1',sharedLanguage);
   if (stored !== undefined) storage.set('pocket-level:v1', typeof stored === 'string' ? stored : JSON.stringify(stored));
   class Element {
     constructor(tag, attributes = {}) {
@@ -29,10 +30,11 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
     get className() { return [...this.classes].join(' '); }
     addEventListener(type, fn) { if (!this.listeners.has(type)) this.listeners.set(type, []); this.listeners.get(type).push(fn); }
     removeEventListener(type, fn) { this.listeners.set(type, (this.listeners.get(type) || []).filter(f => f !== fn)); }
+    removeAttribute(key){delete this.attributes[key]}
     setAttribute(key, value) { this.attributes[key] = String(value); }
     getAttribute(key) { return this.attributes[key] ?? null; }
     querySelector() { return this.child ||= new Element('span'); }
-    focus() {}
+    focus() {document.activeElement=this}
     showModal() { this.open = true; }
     close() { this.open = false; this.dispatch('close'); }
     dispatch(type, extra = {}) { for (const fn of this.listeners.get(type) || []) fn({ target: this, currentTarget: this, ...extra }); }
@@ -56,7 +58,7 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
   for (const match of html.matchAll(/<script[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/script>/g)) byId.get(match[1]).textContent = match[2];
   function Sensor() {}
   Sensor.requestPermission = () => { permissionCalls++; throw Error('Actual permission path must not run in these tests'); };
-  const context = { console, document, navigator: { language }, performance: { now: () => now }, location: { protocol: 'https:' }, isSecureContext: true,
+  const context = { URL,console, document, navigator: { language }, performance: { now: () => now }, location: { protocol: 'https:',href:url }, isSecureContext: true,
     DeviceMotionEvent: Sensor, DeviceOrientationEvent: Sensor,
     localStorage: { getItem(key) { if (storageUnavailable) throw Error('Storage unavailable'); return storage.get(key) || null; }, setItem(key, value) { if (storageUnavailable) throw Error('Storage unavailable'); storage.set(key, value); } },
     setTimeout(fn, ms) { timers.set(++nextTimer, { fn, at: now + ms, repeat: 0 }); return nextTimer; }, clearTimeout: id => timers.delete(id),
@@ -68,8 +70,8 @@ function createHarness({ stored, storageUnavailable = false, language = 'en' } =
   // Test-only observability; no hooks or exports are inserted into production HTML.
   const exposed = script.replace(/\}\)\(\);\s*$/, 'globalThis.testApi={state,attachSensorListeners,renderMeter};})();');
   if (exposed === script) throw Error('Application closure not found');
-  vm.createContext(context); vm.runInContext(exposed, context); context.testApi.attachSensorListeners();
-  return { html, nodes: byId, allNodes: nodes, document, state: context.testApi.state, storage, render: context.testApi.renderMeter,
+  vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(__dirname,'../../components/ui-conventions.js'),'utf8'),context);vm.runInContext(exposed, context); context.testApi.attachSensorListeners();
+  return { context,html, nodes: byId, allNodes: nodes, document, state: context.testApi.state, storage, render: context.testApi.renderMeter,
     permissionCalls: () => permissionCalls,
     dispatch(type, event) { for (const fn of listeners.get(type) || []) fn(event); },
     motion(x, y, z) { this.dispatch('devicemotion', { accelerationIncludingGravity: { x, y, z } }); },

@@ -17,7 +17,7 @@ for (const custom of [false, true]) {
   test(`build refreshes canonical download and self-extract bytes (${custom ? 'custom' : 'default'} paths)`, t => {
     const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'pocket-level-build-'));
     t.after(() => fs.rmSync(fixture, { recursive: true, force: true }));
-    for (const name of ['src', 'scripts', 'app.config.json', 'dependencies.json', 'build-standalone.ps1']) fs.cpSync(path.join(root, name), path.join(fixture, name), { recursive: true });
+    for (const name of ['src','components', 'scripts', 'app.config.json', 'dependencies.json', 'build-standalone.ps1']) fs.cpSync(path.join(root, name), path.join(fixture, name), { recursive: true });
     // Seed a stale public download: rebuilding must replace it from source.
     fs.writeFileSync(path.join(fixture, 'pocket-level.html'), 'stale download');
     const config = JSON.parse(fs.readFileSync(path.join(fixture, 'app.config.json'), 'utf8'));

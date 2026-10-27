@@ -121,3 +121,7 @@ Users often need a spirit level only briefly and do not want to install a native
 ## Header visibility
 
 Keep the header version visible on narrow smartphones without overlapping the app name or language/Help controls. Verify Japanese and English at 320px, 360px, 390px and desktop widths.
+
+## Common UI v1
+
+Readings remain tab-only; preferences/reference persistence failures keep current measurements and show explicit retry. Startup reads language/settings without writing them. Ambiguous legacy Edge references remain safely reset in memory and are normalized on the next explicit preference save. Current-mode reference reset has durable scoped Restore reference; cancelled captures do not resume. Calibration-reset confirmation preserves ownership and relocalizes while open.

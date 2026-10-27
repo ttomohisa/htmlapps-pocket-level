@@ -12,7 +12,7 @@ try {
     $env:POCKET_LEVEL_HTML = $null
     & node --test @testFiles
     if ($LASTEXITCODE -ne 0) { throw 'Application or build regression tests failed' }
-    $runtimeTests = @((Join-Path $Root 'tests/measurement-flow.test.cjs'), (Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'), (Join-Path $Root 'tests/modal-scroll.test.cjs'))
+    $runtimeTests = @((Join-Path $Root 'tests/measurement-flow.test.cjs'), (Join-Path $Root 'tests/sensor-validity.test.cjs'), (Join-Path $Root 'tests/primary-readout.test.cjs'), (Join-Path $Root 'tests/header-language.test.cjs'), (Join-Path $Root 'tests/modal-scroll.test.cjs'),(Join-Path $Root 'tests/shared-ui.test.cjs'))
     $artifacts = @($config.build.output, 'pocket-level.html')
     if ($config.build.selfExtract.enabled) { $artifacts += $config.build.selfExtract.output }
     foreach ($artifact in $artifacts) {
@@ -32,3 +32,6 @@ if ($LASTEXITCODE -ne 0) { throw "User-facing help copy regression failed." }
 # Header icons and version visibility across source and generated releases.
 & node (Join-Path $Root "scripts/test-header-ui.cjs")
 if ($LASTEXITCODE -ne 0) { throw "Header UI regression failed." }
+
+& node (Join-Path $Root "scripts/test-common-ui.cjs")
+if ($LASTEXITCODE -ne 0) { throw "Shared UI pin/native-script/gzip checks failed." }

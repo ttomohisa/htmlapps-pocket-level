@@ -34,9 +34,9 @@ for (const language of ['ja', 'en']) {
     let current = language;
     for (let i = 0; i < 4; i++) {
       assertHeader(h, current);
-      assert.equal(h.stored().lang, current);
+      assert.equal(h.storage.get('browser-kitty:ui-language:v1')||stored.lang,current);assert.equal(h.stored().lang,stored.lang,'shared language selection does not rewrite legacy record');
       assert.deepEqual(settings(), before);
-      assertHeader(createHarness({ stored: h.stored() }), current);
+      assertHeader(createHarness({ stored: h.stored(),sharedLanguage:h.storage.get('browser-kitty:ui-language:v1') }), current);
       h.nodes.get('languageButton').click();
       current = current === 'ja' ? 'en' : 'ja';
     }

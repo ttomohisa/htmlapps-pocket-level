@@ -23,7 +23,7 @@ for (const preference of ['angle', 'slope', undefined, 'percent', '', null, fals
     const h = createHarness({ stored: { readout: preference } });
     const expected = preference === 'slope' ? 'slope' : 'angle';
     assert.equal(h.state.readout, expected); assert.equal(h.nodes.get('primaryReadoutSelect').value, expected);
-    assert.equal(h.stored().readout, expected);
+    assert.deepEqual(h.stored().readout,preference,'startup reads preferences without rewriting them');
   });
 }
 for (const options of [{ stored: '{' }, { storageUnavailable: true }]) {
