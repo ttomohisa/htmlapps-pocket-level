@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2026-10-27
+
+- Keep the header version visible on narrow smartphones without overlapping the app name or language/Help controls.
+
 ## 1.1.0 - 2026-10-13
 
 - Prioritize the measuring display on phones and place the existing 2-second average beside Hold.

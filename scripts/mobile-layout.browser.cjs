@@ -52,7 +52,7 @@ async function main() {
   const browser = await chromium.launch();
   try {
     const cases = [];
-    for (const language of ['ja','en']) for (const [width,height] of [[1360,900],[cfg.phone+1,568],[cfg.phone,568],[561,568],[560,568],[320,568],[393,252]]) cases.push({file:'dist/index.html',language,width,height});
+    for (const language of ['ja','en']) for (const [width,height] of [[1360,900],[cfg.phone+1,568],[cfg.phone,568],[561,568],[560,568],[320,568],[360,640],[390,844],[393,252]]) cases.push({file:'dist/index.html',language,width,height});
     cases.push({file:'dist/index.self-extract.html',language:'en',width:360,height:640});
     cases.push({file:cfg.slug+'.html',language:'ja',width:1360,height:900});
     for (const {file,language,width,height} of cases) {
@@ -66,6 +66,10 @@ async function main() {
         await page.goto(pathToFileURL(path.resolve(file)).href + (cfg.slug === 'developer-toolbox' ? '#base64' : ''));
         await page.locator('#helpButton').waitFor();
         if (await page.locator('html').getAttribute('lang') !== language) await page.locator('#languageButton').click();
+ const headerVersion=page.locator('header .version-badge');
+ assert.equal(await headerVersion.isVisible(),true,label+': header version is visible');
+ assert.equal((await headerVersion.textContent()).trim(),'v'+JSON.parse(fs.readFileSync(path.resolve(__dirname,'../app.config.json'),'utf8')).version,label+': current version');
+ assert.ok(await headerVersion.evaluate(el=>{const r=el.getBoundingClientRect();if(r.left<0||r.right>innerWidth||el.scrollWidth>el.clientWidth+1)return false;for(let p=el.parentElement;p;p=p.parentElement){if(/hidden|clip/.test(getComputedStyle(p).overflowX)){const b=p.getBoundingClientRect();if(r.left<b.left-1||r.right>b.right+1)return false;}}return true;}),label+': version is not clipped');
         const badge = page.locator(cfg.badge);
         assert.equal((await badge.textContent()).trim(), language === 'ja' ? cfg.ja : cfg.en, label + ': privacy text');
         const visible = width > cfg.hide && !(cfg.slug === 'pocket-level' && height <= 520 && width >= height);

@@ -117,3 +117,7 @@ Users often need a spirit level only briefly and do not want to install a native
 - Hide only the informational footer at the existing 760px measuring-dock breakpoint, retaining the dock and safe-area clearance. The English equivalent of 完全ローカル処理 is Fully local processing; retain existing mobile badge hiding and sensor behavior.
 
 - Keep the Help header fixed within its existing bounded dialog and let only its body shrink and scroll, so the final English/Japanese guidance stays reachable at desktop and phone sizes. Other dialogs retain their existing layout.
+
+## Header visibility
+
+Keep the header version visible on narrow smartphones without overlapping the app name or language/Help controls. Verify Japanese and English at 320px, 360px, 390px and desktop widths.
