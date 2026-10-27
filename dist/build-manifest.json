@@ -1,7 +1,7 @@
 {
   "name": "Pocket Level",
-  "version": "1.1.0",
-  "generatedAt": "2026-10-23T10:11:24.4865057+00:00",
+  "version": "1.1.1",
+  "generatedAt": "2026-10-27T03:13:53.4180648+00:00",
   "dependencyCount": 0,
   "source": "src/index.template.html"
 }
