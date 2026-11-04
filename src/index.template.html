@@ -173,6 +173,121 @@
       .version-badge { flex: 0 0 auto; white-space: nowrap; }
       .header-actions { flex: 0 0 auto; }
     }
+
+    /* Mobile measuring surface: treat the phone as an instrument, not a dashboard. */
+    .mobile-settings-button{display:none}
+    @media(max-width:760px){
+      :root{--header-height:56px}
+      .app-header{background:var(--surface);backdrop-filter:none}
+      .header-inner{min-height:56px;padding:6px clamp(8px,2.5vw,14px);gap:6px}
+      .brand{gap:7px}
+      .brand-mark{width:32px;height:32px;border-radius:9px;box-shadow:none}
+      .brand-mark svg{width:20px;height:20px}
+      .brand-name{font-size:clamp(13px,3.8vw,16px)}
+      .version-badge{margin-left:4px;padding:1px 4px;font-size:9px}
+      .header-actions{gap:0}
+      .language-button,.header-icon-button{display:grid;place-items:center;min-width:40px;height:44px;padding:0}
+      .header-actions .mobile-settings-button{display:grid}
+      .main{padding:0 14px calc(94px + env(safe-area-inset-bottom))}
+      .page-intro{display:none}
+      .level-app{display:block}
+      .info-panel{display:none}
+      .meter-card{border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+      .meter-top{padding:12px 0 0}
+      .mode-switch{padding:3px;border-radius:10px;background:#e9ece9}
+      .mode-button{min-height:42px;padding:7px 8px;border-radius:8px;font-size:14px;font-weight:650}
+      .mode-button[aria-selected="true"]{box-shadow:0 1px 3px rgba(25,28,24,.09)}
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{
+        height:calc(100svh - 208px);
+        height:calc(100dvh - 208px);
+        min-height:340px;max-height:none;
+        padding:12px 0 10px;justify-content:center
+      }
+      .sensor-stage.is-level::before,.sensor-stage.is-locked::after{display:none}
+      .meter-visual,html[data-measuring="true"] .meter-visual{
+        width:min(70vw,278px,37svh);flex:0 0 auto
+      }
+      .bullseye{
+        border:1.5px solid #c4cec8;
+        background:
+          radial-gradient(circle at center,transparent 0 19%,#cad8d0 19.4% 19.8%,transparent 20.2% 42%,#e0e7e2 42.4% 42.8%,transparent 43.2%),
+          linear-gradient(90deg,transparent calc(50% - .5px),#dce5df 50%,transparent calc(50% + .5px)),
+          linear-gradient(0deg,transparent calc(50% - .5px),#dce5df 50%,transparent calc(50% + .5px)),#f8faf8;
+        box-shadow:none
+      }
+      .target-ring{width:56px;height:56px;border:1.5px solid #91ad9d}
+      .bubble,.is-level .bubble{
+        width:44px;height:44px;border:2px solid #fff;
+        background:var(--accent);box-shadow:0 0 0 1.5px #89aa9a
+      }
+      .reading{margin-top:clamp(7px,1.7svh,16px)}
+      .reading-value,html[data-measuring="true"] .reading-value{
+        font-size:clamp(55px,10svh,82px);font-weight:750;letter-spacing:-.055em
+      }
+      .reading-unit{font-size:23px}
+      .sensor-stage:not(.edge-mode) .reading-sub{display:none}
+      .reading-sub{margin-top:6px;min-height:0;font-size:13px}
+      .axis-readings{margin-top:8px;gap:22px}
+      .axis-chip{min-width:0;padding:0;border:0;border-radius:0;background:none;color:var(--muted);font-size:13px;white-space:nowrap}
+      .axis-chip strong{font-size:14px;font-weight:700;color:var(--text)}
+      .reference-row{display:none;margin:0 0 6px;gap:8px;font-size:12px}
+      .has-relative-reference .reference-row{display:flex}
+      .reference-reset{min-height:36px;padding:6px 10px}
+      .stage-status,html[data-measuring="true"] .stage-status{
+        min-height:26px;margin-top:12px;gap:8px;font-size:13px;font-weight:600
+      }
+      .stage-status.stable{font-weight:700}
+      .capture-controls{min-height:40px;margin:2px 0 0}
+      .capture-controls .button{
+        min-height:40px;padding:5px 10px;border:0;background:transparent;
+        box-shadow:none;color:var(--muted);font-size:12px;font-weight:600
+      }
+      .capture-controls .button:hover{border:0;background:transparent;color:var(--accent)}
+      .capture-status{margin:0;min-height:18px;font-size:12px}
+      .edge-mode .meter-visual{width:100%;height:112px;aspect-ratio:auto}
+      .edge-vial{width:min(100%,390px);height:92px;border-radius:46px;box-shadow:none}
+      .edge-bubble,.is-level .edge-bubble{
+        width:62px;height:62px;background:var(--accent);
+        box-shadow:0 0 0 2px #9fb8ab,inset 0 2px 4px rgba(255,255,255,.12)
+      }
+      .start-overlay{background:var(--bg);backdrop-filter:none;padding:20px 16px}
+      .start-icon{width:56px;height:56px;margin-bottom:14px;border-radius:14px}
+      .start-icon svg{width:29px;height:29px}
+      .start-box h3{font-size:18px}
+      .start-box p{font-size:13px}
+      .control-dock{
+        position:fixed;left:0;right:0;bottom:0;z-index:26;
+        display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:4px;margin:0;padding:7px 12px max(9px,env(safe-area-inset-bottom));
+        border:0;border-top:1px solid var(--line);border-radius:0;
+        background:var(--surface);backdrop-filter:none;
+        box-shadow:0 -4px 18px rgba(25,28,24,.06)
+      }
+      .control-dock #settingsButton{display:none}
+      .dock-button{min-height:58px;padding:6px 4px;gap:4px;border-radius:9px;font-size:12px}
+      .dock-button svg{width:22px;height:22px}
+      .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+    }
+    @media(max-width:760px) and (orientation:landscape) and (max-height:520px){
+      .main{padding-top:4px}
+      .meter-top{padding-top:4px}
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{
+        display:grid;grid-template-columns:minmax(120px,35%) minmax(0,1fr);
+        gap:0 12px;align-items:center;height:auto;min-height:172px;padding:6px 0
+      }
+      .sensor-stage .meter-visual,html[data-measuring="true"] .sensor-stage .meter-visual{
+        grid-column:1;grid-row:1 / span 4;width:min(35svh,165px);justify-self:center
+      }
+      .sensor-stage .reading{grid-column:2;grid-row:1;margin-top:0}
+      .sensor-stage .stage-status{grid-column:2;grid-row:2;margin-top:4px}
+      .sensor-stage .capture-controls{grid-column:2;grid-row:3}
+      .sensor-stage .capture-status{grid-column:2;grid-row:4}
+      .sensor-stage.edge-mode .meter-visual{width:100%;height:92px}
+      .sensor-stage.edge-mode .edge-vial{height:76px}
+      .sensor-stage.edge-mode .edge-bubble{width:52px;height:52px}
+      .reading-value,html[data-measuring="true"] .reading-value{font-size:clamp(45px,14svh,64px)}
+      .axis-readings{display:none}
+    }
   </style>
 </head>
 <body>
@@ -187,6 +302,7 @@
       </div>
       <div class="header-actions">
         <button type="button" class="language-button" id="languageButton" aria-label="英語に切り替え" title="英語に切り替え">EN</button>
+        <button type="button" class="header-icon-button mobile-settings-button" id="mobileSettingsButton" aria-label="設定" title="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3.5h3l.7 2.2 1.5.9 2.3-.6 1.5 2.6-1.7 1.6v1.8l1.7 1.6-1.5 2.6-2.3-.6-1.5.9-.7 2.2h-3l-.7-2.2-1.5-.9-2.3.6-1.5-2.6 1.7-1.6v-1.8L4.5 8.6 6 6l2.3.6 1.5-.9z"/><circle cx="12" cy="11.9" r="2.5"/></svg></button>
         <button type="button" class="header-icon-button" id="helpButton" aria-label="使い方と注意事項" title="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.8 9.2a2.4 2.4 0 0 1 4.6.9c0 1.8-2.4 2-2.4 3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></button>
       </div>
     </div>
@@ -553,7 +669,7 @@
       els.mainReadingUnit.textContent=state.readout==='slope'?'%':'°';
       els.slopeDisplay.textContent=`${fmt(r.slope)}%`;els.toleranceDisplay.textContent=`±${state.tolerance.toFixed(1)}°`;
       const metric=stabilityMetric();els.stabilityDisplay.textContent=Number.isFinite(metric)?stabilityLabel(metric):'—';
-      els.referenceDisplay.textContent=hasCustomZero()?t('relativeReference'):t(state.mode==='flat'?'absoluteReference':'edgeAbsoluteReference');els.referenceLabel.textContent=els.referenceDisplay.textContent;els.referenceResetButton.hidden=!hasCustomZero();
+      els.referenceDisplay.textContent=hasCustomZero()?t('relativeReference'):t(state.mode==='flat'?'absoluteReference':'edgeAbsoluteReference');els.referenceLabel.textContent=els.referenceDisplay.textContent;els.referenceResetButton.hidden=!hasCustomZero();els.sensorStage.classList.toggle('has-relative-reference',hasCustomZero());
       syncCaptureUI();syncHoldUI();updateStatus(isLevel,metric,r);updateLevelFeedback(isLevel,metric);
     }
     function updateStatus(isLevel,metric,r){els.stageStatus.className='stage-status';let text;if(state.sensorErrorKey){text=t(state.sensorErrorKey);els.stageStatus.classList.add('warning')}else if(state.running&&!state.hasSensorData){text=t('sensorChecking');els.stageStatus.classList.add('warning')}else if(state.hasSensorData&&r.valid===false){text=state.mode==='edge'?t('edgePosture'):r.surfacePosture===false?t('surfacePosture'):t('invalidSurface');els.stageStatus.classList.add('warning')}else if(state.locked){text=t('sensorLocked');els.stageStatus.classList.add('stable')}else if(!state.hasSensorData){text=t('waiting')}else if(state.mode==='edge'&&r.postureOk===false){text=t('edgePosture');els.stageStatus.classList.add('warning')}else if(metric<.08){text=isLevel?t(hasCustomZero()?'referenceMatched':state.mode==='edge'?'levelOrPlumbNow':'levelNow'):t('sensorStable');els.stageStatus.classList.add('stable')}else{text=t('sensorMoving')};if(state.hasSensorData&&r.valid!==false&&state.readout==='slope'&&r.slope===null)text=t('verticalSlope');els.stageStatusText.textContent=text}
@@ -637,7 +753,7 @@
     async function requestWakeLock(){if(!state.running||!state.wakeEnabled||!('wakeLock'in navigator)||document.visibilityState!=='visible')return;try{if(state.wakeLock)return;state.wakeLock=await navigator.wakeLock.request('screen');state.wakeLock.addEventListener('release',()=>{state.wakeLock=null})}catch{state.wakeLock=null}}
     async function releaseWakeLock(){try{await state.wakeLock?.release()}catch{}state.wakeLock=null}
 
-    function updateLanguage(){document.documentElement.lang=state.lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[state.lang][key]!==undefined)el.textContent=t(key)});els.languageButton.textContent=t('languageName');els.languageButton.setAttribute('aria-label',t('switchLanguage'));els.languageButton.title=t('switchLanguage');els.helpButton.setAttribute('aria-label',t('helpTitle'));els.helpButton.title=t('helpTitle');document.querySelectorAll('.dialog-close').forEach(b=>b.setAttribute('aria-label',t('close')));els.holdLabel.textContent=state.locked?t('resume'):t('hold');syncSensorStartUI();updateSettingsUI();renderMeter();persist()}
+    function updateLanguage(){document.documentElement.lang=state.lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[state.lang][key]!==undefined)el.textContent=t(key)});els.languageButton.textContent=t('languageName');els.languageButton.setAttribute('aria-label',t('switchLanguage'));els.languageButton.title=t('switchLanguage');els.helpButton.setAttribute('aria-label',t('helpTitle'));els.helpButton.title=t('helpTitle');els.mobileSettingsButton.setAttribute('aria-label',t('settings'));els.mobileSettingsButton.title=t('settings');document.querySelectorAll('.dialog-close').forEach(b=>b.setAttribute('aria-label',t('close')));els.holdLabel.textContent=state.locked?t('resume'):t('hold');syncSensorStartUI();updateSettingsUI();renderMeter();persist()}
     function updateSettingsUI(){els.primaryReadoutSelect.value=state.readout;document.querySelectorAll('#toleranceButtons button').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)===state.tolerance));els.vibrationToggle.checked=state.vibration;els.soundToggle.checked=state.sound;els.wakeLockToggle.checked=state.wakeEnabled;els.calibrationStatus.textContent=state.calibration.updatedAt?t('calibrated',{x:fmt(state.calibration.biasX,2),y:fmt(state.calibration.biasY,2)}):t('notCalibrated');els.resetCalibrationButton.disabled=!state.calibration.updatedAt;els.resetZeroButton.disabled=!hasCustomZero();updateSensorDependentControls();els.referenceDisplay.textContent=hasCustomZero()?t('customZero'):t('factoryZero')}
     function openDialog(dialog){if(!dialog.open)dialog.showModal()}
     function closeDialog(dialog){if(dialog?.open)dialog.close()}
@@ -649,7 +765,7 @@
 
     els.startButton.addEventListener('click',startSensors);
     els.flatModeButton.addEventListener('click',()=>setMode('flat'));els.edgeModeButton.addEventListener('click',()=>setMode('edge'));
-    els.zeroButton.addEventListener('click',setZero);els.holdButton.addEventListener('click',toggleHold);els.settingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.helpButton.addEventListener('click',()=>openDialog(els.helpDialog));
+    els.zeroButton.addEventListener('click',setZero);els.holdButton.addEventListener('click',toggleHold);els.settingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.mobileSettingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.helpButton.addEventListener('click',()=>openDialog(els.helpDialog));
     els.languageButton.addEventListener('click',()=>{state.lang=state.lang==='ja'?'en':'ja';updateLanguage()});
     document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>closeDialog(document.getElementById(btn.dataset.closeDialog))));[els.settingsDialog,els.calibrationDialog,els.helpDialog].forEach(d=>d.addEventListener('click',handleBackdrop));
     els.primaryReadoutSelect.addEventListener('change',()=>{const value=els.primaryReadoutSelect.value;if(value==='angle'||value==='slope'){state.readout=value;persist();renderMeter()}els.primaryReadoutSelect.value=state.readout});
