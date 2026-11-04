@@ -269,6 +269,8 @@
       .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
     }
     @media(max-width:760px) and (orientation:landscape) and (max-height:520px){
+      /* A sticky header otherwise blocks the mode tabs on very short screens. */
+      .app-header{position:static}
       .main{padding-top:4px}
       .meter-top{padding-top:4px}
       .sensor-stage,html[data-measuring="true"] .sensor-stage{
