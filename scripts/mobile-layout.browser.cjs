@@ -35,13 +35,18 @@ async function controls(page, width, height, label) {
     assert.ok(['Alpha','Beta','Gamma'].includes((await page.locator('.winner-name').textContent()).trim()));
   } else {
     // Do not request sensors or permissions. Exercise the ordinary waiting-state UI.
-    assert.equal(await page.locator('.control-dock button').count(), 4);
+    const isPhone = width <= cfg.phone;
+    assert.equal(await page.locator('.control-dock button').count(), 4, label + ': desktop controls remain in the DOM');
+    assert.equal(await page.locator('.control-dock button:visible').count(), isPhone ? 3 : 4, label + ': primary dock actions');
+    assert.equal(await page.locator('#mobileSettingsButton').isVisible(), isPhone, label + ': header Settings breakpoint');
     assert.equal(await page.locator('#zeroButton').isDisabled(), true);
     assert.equal(await page.locator('#holdButton').isDisabled(), true);
     await page.locator('#edgeModeButton').click();
     assert.equal(await page.locator('#edgeModeButton').getAttribute('aria-selected'), 'true');
     await page.locator('#flatModeButton').click();
-    await page.locator('#settingsButton').click();
+    const settings = page.locator(isPhone ? '#mobileSettingsButton' : '#settingsButton');
+    if (isPhone) await bounds(settings, width, height, label);
+    await settings.click();
     assert.equal(await page.locator('#settingsDialog').isVisible(), true);
     await page.keyboard.press('Escape');
     if (width <= cfg.phone) await bounds(page.locator('.control-dock'), width, height, label);
