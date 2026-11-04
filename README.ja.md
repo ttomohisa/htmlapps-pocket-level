@@ -123,6 +123,16 @@ beta/gammaのいずれかが欠けている、または有限の数値でない�
 
 校正値は設定画面からリセットできます。
 
+## タグとGitHub Releaseを公開する
+
+リリース準備PRをレビューしてマージした後、GitHubの **Actions → Package / publish GitHub Release → Run workflow** を開きます。ブランチは `main`、確認欄には `v1.2.0` と入力してください。
+
+ワークフローはバージョンとmainのコミットを照合し、ビルド・回帰テストに通過したら **`v1.2.0` タグとGitHub Releaseを作成** します。添付するのは通常の単一HTML、自己展開HTML、配布ZIP、`SHA256SUMS.txt` の4ファイルです。
+
+PRで走るチェックは配布ファイルを組み立てるだけで、**タグやReleaseを公開しません**。同じタグがすでにある場合は上書きせず停止します。ワークフローを実行する前にタグを別途作成する必要はありません。
+
+リリースノート: [v1.2.0](docs/releases/v1.2.0.md)。
+
 ## GitHub Pagesで公開する
 
 このリポジトリには、単一HTMLをビルド・検証して `dist/` をGitHub Pagesへ自動公開するワークフローが含まれています。
@@ -144,11 +154,13 @@ beta/gammaのいずれかが欠けている、または有限の数値でない�
 ├─ build-standalone.bat          # Windows用ビルド入口
 ├─ build-standalone.ps1          # 単一HTML生成処理
 ├─ scripts/check-repository.ps1  # ビルド + リポジトリ検証
+├─ scripts/package-release.ps1   # リリース配布物とSHA-256の生成
 ├─ dist/index.html               # 可読な単一HTML生成物
 ├─ dist/index.self-extract.html  # gzip自己展開版
 └─ .github/workflows/
    ├─ build-standalone.yml       # ビルド検証
-   └─ deploy-pages.yml           # GitHub Pages自動公開
+   ├─ deploy-pages.yml           # GitHub Pages自動公開
+   └─ publish-release.yml        # 手動でタグとGitHub Releaseを公開
 ```
 
 ### Windowsでビルド
