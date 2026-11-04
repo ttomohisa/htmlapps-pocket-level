@@ -84,3 +84,23 @@ test('short Japanese and English measurement copy is used without privacy boiler
   assert.equal(label('pageLead'), 'Measure the tilt of surfaces and edges with your phone.');
   assert.equal(label('startDescription'), 'Uses motion sensors. Your browser may ask for permission.');
 });
+
+
+test('header artwork matches the favicon data and favicon.svg source', () => {
+  const favicon = html.match(/<link rel="icon" href="([^"]+)"/)?.[1];
+  const logo = html.match(/<div class="brand-mark"[^>]*><img src="([^"]+)" alt=""><\/div>/)?.[1];
+  assert.ok(favicon?.startsWith('data:image/svg+xml,'));
+  assert.equal(logo, favicon);
+  const source = fs.readFileSync(path.join(__dirname, '../assets/favicon.svg'), 'utf8');
+  const decoded = decodeURIComponent(favicon.slice('data:image/svg+xml,'.length));
+  const canonical = svg => svg.replace(/>\s+</g, '><').replace(/"/g, "'").replace(/#fff\b/gi, 'white').trim();
+  assert.equal(canonical(decoded), canonical(source));
+  assert.match(css, /\.brand-mark img\{display:block;width:100%;height:100%\}/);
+  assert.doesNotMatch(html, /class="brand-mark"[^>]*><svg/);
+});
+
+test('header and headline type sizing does not depend on Japanese or English', () => {
+  assert.match(css, /-webkit-text-size-adjust:100%;text-size-adjust:100%/);
+  assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?\.brand-name\{font-size:15px\}/);
+  assert.doesNotMatch(css, /\.brand-name:lang\(|\.brand-name\[lang/);
+});
