@@ -126,6 +126,14 @@ Older Edge references did not retain the contact direction and cannot be reconst
 
 Calibration can be reset from the settings panel.
 
+## Tag and publish a GitHub Release
+
+After reviewing and merging the release-preparation PR, open **Actions → Package / publish GitHub Release → Run workflow** on `main`. Enter `v1.2.0` in the confirmation field. The workflow checks the current version and main-branch commit, runs the full build and tests, then creates the `v1.2.0` tag and GitHub Release with the readable HTML, self-extracting HTML, ZIP, and `SHA256SUMS.txt`.
+
+The PR workflow only prepares and checks the package; **it never publishes a tag or Release**. If the version tag already exists, manual publication stops rather than overwriting it. Do not create the tag separately before running this workflow.
+
+Release notes: [v1.2.0](docs/releases/v1.2.0.md).
+
 ## Publish with GitHub Pages
 
 The repository includes a workflow that builds the standalone HTML, verifies the repository, and deploys `dist/` to GitHub Pages.
@@ -147,11 +155,13 @@ Each deployment rebuilds and verifies the generated files before publishing them
 ├─ build-standalone.bat          # Windows build entry point
 ├─ build-standalone.ps1          # Standalone HTML builder
 ├─ scripts/check-repository.ps1  # Build + repository verification
+├─ scripts/package-release.ps1   # Release bundle + SHA-256 checksums
 ├─ dist/index.html               # Generated readable single-file app
 ├─ dist/index.self-extract.html  # Generated gzip self-extracting variant
 └─ .github/workflows/
    ├─ build-standalone.yml       # Build validation
-   └─ deploy-pages.yml           # Automatic GitHub Pages deployment
+   ├─ deploy-pages.yml           # Automatic GitHub Pages deployment
+   └─ publish-release.yml        # Manual tag + GitHub Release
 ```
 
 ### Build on Windows
