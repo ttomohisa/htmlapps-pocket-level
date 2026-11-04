@@ -272,6 +272,13 @@
       /* A sticky header otherwise blocks the mode tabs on very short screens. */
       .app-header{position:static}
       .main{padding-top:4px}
+      /* Keep the start prompt inside the stage rather than over the mode tabs. */
+      .start-overlay{padding:8px 10px;overflow:hidden;align-items:center;justify-content:center}
+      .start-box{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:8px;width:100%;max-width:none;text-align:left}
+      .start-icon{display:none}
+      .start-box h3{grid-column:1;grid-row:1;margin:0 0 3px;font-size:14px}
+      .start-box p{grid-column:1;grid-row:2;margin:0;font-size:11px;line-height:1.35}
+      .start-box .start-button{grid-column:2;grid-row:1 / span 2;min-width:96px;min-height:44px;padding:6px 9px;font-size:12px}
       .meter-top{padding-top:4px}
       .sensor-stage,html[data-measuring="true"] .sensor-stage{
         display:grid;grid-template-columns:minmax(120px,35%) minmax(0,1fr);
