@@ -52,16 +52,17 @@ test('desktop privacy badge uses the Reverse Clip check-shield without changing 
   assert.doesNotMatch(badge, /<rect\b/, 'The old padlock body is absent');
   assert.match(badge, /data-i18n="localOnly">完全ローカル処理<\/span>/);
 });
-test('Japanese and English Help retain close routes without layout audit prose', () => {
+test('Help keeps actual close controls without redundant instructions', () => {
   const help = html.match(/APP:HELP:BEGIN([\s\S]*?)APP:HELP:END/)?.[1];
-  assert.match(help || '', /data-i18n="helpDialogScroll"/);
+  assert.ok(help, 'Help dialog is present');
+  assert.doesNotMatch(help, /data-i18n="helpDialogScroll"/);
+  assert.doesNotMatch(help, /「閉じる」、Esc、外側のクリックで閉じます。/);
   const translationsText = html.match(/const translations = (\{[\s\S]*?\n    \});/)?.[1];
   assert.ok(translationsText, 'Real translation object remains available');
   const translations = vm.runInNewContext(`(${translationsText})`);
-  assert.doesNotMatch(translations.ja.helpDialogScroll, /背景.*スクロール/);
-  assert.match(translations.ja.helpDialogScroll, /閉じる.*Esc.*外側/);
-  assert.doesNotMatch(translations.en.helpDialogScroll, /background.*scroll/i);
-  assert.match(translations.en.helpDialogScroll, /Close.*Esc.*outside/);
+  assert.equal(translations.ja.helpDialogScroll, undefined);
+  assert.equal(translations.en.helpDialogScroll, undefined);
+  assert.match(help, /data-close-dialog="helpDialog"/, 'The visible Close control remains available');
 });
 
 test('canonical runner includes source and artifact regression checks with failure propagation and environment restoration', () => {
