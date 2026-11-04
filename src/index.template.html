@@ -249,6 +249,11 @@
       .dock-button svg{width:22px;height:22px}
       .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
     }
+    @media(max-width:760px) and (orientation:portrait) and (max-height:650px){
+      /* On short phones, let the stage grow rather than overlap the mode tabs. */
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{height:auto;min-height:0;justify-content:flex-start;padding-top:12px}
+      .meter-visual,html[data-measuring="true"] .meter-visual{width:min(72vw,31svh)}
+    }
     @media(max-width:760px) and (orientation:landscape) and (max-height:520px){
       /* A sticky header otherwise blocks the mode tabs on very short screens. */
       .app-header{position:static}
