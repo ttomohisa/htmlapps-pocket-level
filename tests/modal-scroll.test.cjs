@@ -62,7 +62,7 @@ test('Help keeps actual close controls without redundant instructions', () => {
   const translations = vm.runInNewContext(`(${translationsText})`);
   assert.equal(translations.ja.helpDialogScroll, undefined);
   assert.equal(translations.en.helpDialogScroll, undefined);
-  assert.match(help, /data-close-dialog="helpDialog"/, 'The visible Close control remains available');
+  assert.match(html, /<dialog id="helpDialog"[\s\S]*?data-close-dialog="helpDialog"/, 'The visible Close control remains available');
 });
 
 test('canonical runner includes source and artifact regression checks with failure propagation and environment restoration', () => {
