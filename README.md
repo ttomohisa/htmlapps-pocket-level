@@ -36,7 +36,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - Sensor availability detection with clear error messages for unsupported, denied, insecure, or no-event states
 - Help and Settings keep the background page still while their content scrolls; close with the close button, Esc, or the backdrop.
 - Japanese and English UI in the same HTML
-- Smartphone-first layout with a bottom action bar for one-handed use
+- Focused smartphone layout with a large meter and angle, three bottom actions (Set zero, Hold, 2s average), and Settings in the header; desktop retains the measurement details
 - No third-party runtime library
 
 ## Why the two-point calibration?
