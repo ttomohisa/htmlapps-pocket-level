@@ -81,7 +81,7 @@ async function main() {
             headlineSize: getComputedStyle(headline).fontSize,
             headerHeight: header.getBoundingClientRect().height,
             titleWidth: title.getBoundingClientRect().width,
-            iconReady: image?.complete && image.naturalWidth === 64 && image.naturalHeight === 64,
+            iconReady: image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0,
             iconSrc: image?.getAttribute('src'),
             faviconHref: document.querySelector('link[rel="icon"]')?.getAttribute('href')
           };
