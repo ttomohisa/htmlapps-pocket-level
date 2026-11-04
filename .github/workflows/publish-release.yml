@@ -70,7 +70,9 @@ jobs:
           set -euo pipefail
           test "$(find release-dist -maxdepth 1 -type f | wc -l)" -eq 4
           (cd release-dist && sha256sum --check SHA256SUMS.txt)
-          unzip -t "release-dist/htmlapps-pocket-level-v1.2.0.zip" >/dev/null
+          zip_files=(release-dist/htmlapps-pocket-level-v*.zip)
+          test "${#zip_files[@]}" -eq 1
+          unzip -t "${zip_files[0]}" >/dev/null
 
   publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
