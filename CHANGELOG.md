@@ -6,7 +6,7 @@
 - Improve short portrait/landscape layouts without changing sensor measurement, references, averaging, capture or calibration logic.
 - Align the header icon with the favicon, stabilize Japanese/English title sizing, and match the desktop local-processing shield to Reverse Clip.
 - Refine bilingual labels and Help copy; preserve the existing no-runtime-network standalone build.
-- Add a manually approved, version-checked GitHub Release workflow with standalone HTML, self-extracting HTML, ZIP and SHA-256 checksums.
+- Add a merge-triggered, version-checked GitHub Release workflow with standalone HTML, self-extracting HTML, ZIP and SHA-256 checksums.
 
 ## 1.1.1 - 2026-10-27
 
