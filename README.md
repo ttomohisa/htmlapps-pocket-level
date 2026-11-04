@@ -128,9 +128,11 @@ Calibration can be reset from the settings panel.
 
 ## Tag and publish a GitHub Release
 
-After reviewing and merging the release-preparation PR, open **Actions → Package / publish GitHub Release → Run workflow** on `main`. Enter `v1.2.0` in the confirmation field. The workflow checks the current version and main-branch commit, runs the full build and tests, then creates the `v1.2.0` tag and GitHub Release with the readable HTML, self-extracting HTML, ZIP, and `SHA256SUMS.txt`.
+After reviewing and merging the release-preparation PR to `main`, **GitHub Actions automatically creates the `v1.2.0` tag and publishes the GitHub Release**. No separate manual workflow run is required.
 
-The PR workflow only prepares and checks the package; **it never publishes a tag or Release**. If the version tag already exists, manual publication stops rather than overwriting it. Do not create the tag separately before running this workflow.
+The workflow starts when `.github/release-request.json` is added or changed on `main`. It verifies that the requested tag matches `app.config.json`, checks the current main commit, runs the build and regression suite, and validates the downloadable HTML, self-extracting HTML, ZIP, and `SHA256SUMS.txt` before publishing.
+
+Pull-request checks prepare and verify the downloads **without publishing**. An existing tag is never overwritten. Do not create the tag separately before merging.
 
 Release notes: [v1.2.0](docs/releases/v1.2.0.md).
 
