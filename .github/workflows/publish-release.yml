@@ -55,9 +55,27 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  verify-downloads:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist
+      - name: Check asset count, SHA-256 digests and ZIP integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find release-dist -maxdepth 1 -type f | wc -l)" -eq 4
+          (cd release-dist && sha256sum --check SHA256SUMS.txt)
+          unzip -t "release-dist/htmlapps-pocket-level-v1.2.0.zip" >/dev/null
+
   publish:
     if: github.event_name == 'workflow_dispatch'
-    needs: package
+    needs: [package, verify-downloads]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
