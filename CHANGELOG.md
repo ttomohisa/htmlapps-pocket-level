@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 - 2026-11-05
+
+- Focus the smartphone layout on the original bubble/edge level, angle and stability reading; move Settings to the header and keep three main dock actions.
+- Improve short portrait/landscape layouts without changing sensor measurement, references, averaging, capture or calibration logic.
+- Align the header icon with the favicon, stabilize Japanese/English title sizing, and match the desktop local-processing shield to Reverse Clip.
+- Refine bilingual labels and Help copy; preserve the existing no-runtime-network standalone build.
+- Add a manually approved, version-checked GitHub Release workflow with standalone HTML, self-extracting HTML, ZIP and SHA-256 checksums.
+
 ## 1.1.1 - 2026-10-27
 
 - Keep the header version visible on narrow smartphones without overlapping the app name or language/Help controls.
