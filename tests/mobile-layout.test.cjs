@@ -62,6 +62,9 @@ test('mobile layout retains the original bubble, edge vial and header colors', (
   assert.doesNotMatch(mobile, /\.edge-bubble,\.is-level \.edge-bubble\{/);
   assert.doesNotMatch(mobile, /\.sensor-stage\.is-level::before,\.sensor-stage\.is-locked::after\{display:none\}/);
   assert.match(mobile, /width:min\(78vw,310px,42svh\)/);
+  assert.match(mobile, /@media\(max-width:760px\) and \(orientation:portrait\) and \(max-height:650px\)/);
+  assert.match(mobile, /\.sensor-stage,html\[data-measuring="true"\] \.sensor-stage\{height:auto;min-height:0;justify-content:flex-start;padding-top:12px\}/);
+  assert.match(mobile, /width:min\(72vw,31svh\)/);
 });
 
 test('mobile Settings icon reuses the working desktop gear SVG exactly', () => {
