@@ -89,6 +89,9 @@ async function main() {
         const firstHeader = await headerState();
         assert.equal(firstHeader.iconReady, true, label + ': favicon image is decoded in header');
         assert.equal(firstHeader.iconSrc, firstHeader.faviconHref, label + ': header uses favicon art');
+        if (width <= 600) {
+          assert.ok(await page.locator('.brand-title').evaluate(el => el.scrollWidth <= el.clientWidth + 1), label + ': Pocket Level title is not truncated');
+        }
         await page.locator('#languageButton').click();
         const otherHeader = await headerState();
         assert.equal(otherHeader.titleSize, firstHeader.titleSize, label + ': header title font is language-independent');
