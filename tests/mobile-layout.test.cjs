@@ -46,3 +46,38 @@ test('relative zero context is only emphasized when a custom reference is active
   h.nodes.get('referenceResetButton').click();
   assert.equal(h.nodes.get('sensorStage').classList.contains('has-relative-reference'), false);
 });
+
+
+test('mobile layout retains the original bubble, edge vial and header colors', () => {
+  const mobile = css.slice(css.indexOf('/* Mobile measuring surface:'));
+  const desktop = css.slice(0, css.indexOf('/* Mobile measuring surface:'));
+  assert.match(desktop, /\.app-header\{[^}]*background:color-mix\(in srgb,var\(--bg\) 92%,transparent\)/);
+  assert.doesNotMatch(mobile, /\.app-header\{background:/, 'do not repaint the app header on phones');
+  assert.match(desktop, /\.bullseye\{[^}]*radial-gradient/);
+  assert.match(desktop, /\.bubble\{[^}]*inset 0 6px 10px/);
+  assert.match(desktop, /\.edge-vial\{[^}]*linear-gradient/);
+  assert.doesNotMatch(mobile, /\.bullseye\{/);
+  assert.doesNotMatch(mobile, /\.target-ring\{/);
+  assert.doesNotMatch(mobile, /\.bubble,\.is-level \.bubble\{/);
+  assert.doesNotMatch(mobile, /\.edge-bubble,\.is-level \.edge-bubble\{/);
+  assert.doesNotMatch(mobile, /\.sensor-stage\.is-level::before,\.sensor-stage\.is-locked::after\{display:none\}/);
+  assert.match(mobile, /width:min\(78vw,310px,42svh\)/);
+});
+
+test('mobile Settings icon reuses the working desktop gear SVG exactly', () => {
+  const icon = id => html.match(new RegExp('<button[^>]*id="' + id + '"[^>]*>(<svg[\\s\\S]*?<\\/svg>)'))?.[1];
+  assert.ok(icon('settingsButton'));
+  assert.equal(icon('mobileSettingsButton'), icon('settingsButton'));
+});
+
+test('short Japanese and English measurement copy is used without privacy boilerplate', () => {
+  const h = createHarness({ language: 'ja' });
+  const label = key => h.allNodes.find(node => node.dataset.i18n === key)?.textContent;
+  assert.equal(label('brandMeta'), 'スマホを水平器に');
+  assert.equal(label('pageLead'), 'スマホの傾きセンサーで、平面や辺の傾きを測ります。');
+  assert.equal(label('startDescription'), '傾きセンサーを使います。ブラウザーによっては許可が必要です。');
+  h.nodes.get('languageButton').click();
+  assert.equal(label('brandMeta'), 'Use your phone as a level.');
+  assert.equal(label('pageLead'), 'Measure the tilt of surfaces and edges with your phone.');
+  assert.equal(label('startDescription'), 'Uses motion sensors. Your browser may ask for permission.');
+});
