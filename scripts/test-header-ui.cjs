@@ -16,6 +16,11 @@ for (const target of targets) {
     assert.ok(payload, target + ': gzip payload exists');
     html = zlib.gunzipSync(Buffer.from(payload.trim(), 'base64')).toString('utf8');
   }
+  const favicon = html.match(/<link rel="icon" href="([^"]+)"/)?.[1];
+  const brandIcon = html.match(/<div class="brand-mark"[^>]*><img src="([^"]+)" alt=""><\/div>/)?.[1];
+  assert.ok(favicon && favicon.startsWith('data:image/svg+xml,'), target + ': inline favicon exists');
+  assert.equal(brandIcon, favicon, target + ': header icon uses exactly the favicon image');
+  assert.match(decodeURIComponent(favicon), /viewBox='0 0 64 64'/, target + ': expected favicon geometry');
   const css = html.match(/<style[^>]*>([\s\S]*?)<\/style>/)[1];
   assert.doesNotMatch(css, /\.version-badge\s*\{[^}]*display\s*:\s*none/, target + ': version is not hidden on narrow screens');
   assert.match(css, /\.version-badge\s*\{[^}]*flex\s*:\s*0 0 auto/, target + ': version does not shrink behind the title');

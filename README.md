@@ -26,7 +26,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - **Set zero** to save the current angle as a reference
 - **Hold / Resume** to freeze a reading while moving the phone
 - **Capture when stable**: place the phone and release your hand; a fresh, steady reading is held automatically
-- The active mode’s absolute/saved-angle reference is shown beside the reading with a quick reset
+- The active mode’s reference is shown beside the reading; on phones the default-reference label is omitted while a saved reference retains a quick reset
 - Configurable level tolerance: ±0.1°, ±0.3°, ±0.5°, ±1.0°
 - **Stability indicator** based on recent sensor variance
 - Optional sound and vibration when a stable reading enters the level zone
@@ -36,7 +36,7 @@ The page itself is delivered by GitHub Pages, but sensor readings, calibration, 
 - Sensor availability detection with clear error messages for unsupported, denied, insecure, or no-event states
 - Help and Settings keep the background page still while their content scrolls; close with the close button, Esc, or the backdrop.
 - Japanese and English UI in the same HTML
-- Smartphone-first layout with a bottom action bar for one-handed use
+- Focused smartphone layout with a large meter and angle, three bottom actions (Set zero, Hold, 2s average), and Settings in the header; desktop retains the measurement details
 - No third-party runtime library
 
 ## Why the two-point calibration?

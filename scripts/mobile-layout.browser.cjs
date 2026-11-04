@@ -35,13 +35,18 @@ async function controls(page, width, height, label) {
     assert.ok(['Alpha','Beta','Gamma'].includes((await page.locator('.winner-name').textContent()).trim()));
   } else {
     // Do not request sensors or permissions. Exercise the ordinary waiting-state UI.
-    assert.equal(await page.locator('.control-dock button').count(), 4);
+    const isPhone = width <= cfg.phone;
+    assert.equal(await page.locator('.control-dock button').count(), 4, label + ': desktop controls remain in the DOM');
+    assert.equal(await page.locator('.control-dock button:visible').count(), isPhone ? 3 : 4, label + ': primary dock actions');
+    assert.equal(await page.locator('#mobileSettingsButton').isVisible(), isPhone, label + ': header Settings breakpoint');
     assert.equal(await page.locator('#zeroButton').isDisabled(), true);
     assert.equal(await page.locator('#holdButton').isDisabled(), true);
     await page.locator('#edgeModeButton').click();
     assert.equal(await page.locator('#edgeModeButton').getAttribute('aria-selected'), 'true');
     await page.locator('#flatModeButton').click();
-    await page.locator('#settingsButton').click();
+    const settings = page.locator(isPhone ? '#mobileSettingsButton' : '#settingsButton');
+    if (isPhone) await bounds(settings, width, height, label);
+    await settings.click();
     assert.equal(await page.locator('#settingsDialog').isVisible(), true);
     await page.keyboard.press('Escape');
     if (width <= cfg.phone) await bounds(page.locator('.control-dock'), width, height, label);
@@ -66,10 +71,72 @@ async function main() {
         await page.goto(pathToFileURL(path.resolve(file)).href + (cfg.slug === 'developer-toolbox' ? '#base64' : ''));
         await page.locator('#helpButton').waitFor();
         if (await page.locator('html').getAttribute('lang') !== language) await page.locator('#languageButton').click();
+        const headerState = async () => page.evaluate(() => {
+          const title = document.querySelector('.brand-title');
+          const headline = document.querySelector('#pageTitle');
+          const image = document.querySelector('.brand-mark img');
+          const header = document.querySelector('.header-inner');
+          return {
+            titleSize: getComputedStyle(title).fontSize,
+            headlineSize: getComputedStyle(headline).fontSize,
+            headerHeight: header.getBoundingClientRect().height,
+            titleWidth: title.getBoundingClientRect().width,
+            iconReady: image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0,
+            iconSrc: image?.getAttribute('src'),
+            faviconHref: document.querySelector('link[rel="icon"]')?.getAttribute('href')
+          };
+        });
+        const firstHeader = await headerState();
+        assert.equal(firstHeader.iconReady, true, label + ': favicon image is decoded in header');
+        assert.equal(firstHeader.iconSrc, firstHeader.faviconHref, label + ': header uses favicon art');
+        if (width <= 600) {
+          assert.ok(await page.locator('.brand-title').evaluate(el => el.scrollWidth <= el.clientWidth + 1), label + ': Pocket Level title is not truncated');
+        }
+        await page.locator('#languageButton').click();
+        const otherHeader = await headerState();
+        assert.equal(otherHeader.titleSize, firstHeader.titleSize, label + ': header title font is language-independent');
+        assert.equal(otherHeader.headlineSize, firstHeader.headlineSize, label + ': page headline font is language-independent');
+        assert.ok(Math.abs(otherHeader.headerHeight-firstHeader.headerHeight) <= 1, label + ': header height does not jump on language switch');
+        assert.ok(Math.abs(otherHeader.titleWidth-firstHeader.titleWidth) <= 1, label + ': Pocket Level title width does not jump');
+        await page.locator('#languageButton').click();
  const headerVersion=page.locator('header .version-badge');
  assert.equal(await headerVersion.isVisible(),true,label+': header version is visible');
  assert.equal((await headerVersion.textContent()).trim(),'v'+JSON.parse(fs.readFileSync(path.resolve(__dirname,'../app.config.json'),'utf8')).version,label+': current version');
  assert.ok(await headerVersion.evaluate(el=>{const r=el.getBoundingClientRect();if(r.left<0||r.right>innerWidth||el.scrollWidth>el.clientWidth+1)return false;for(let p=el.parentElement;p;p=p.parentElement){if(/hidden|clip/.test(getComputedStyle(p).overflowX)){const b=p.getBoundingClientRect();if(r.left<b.left-1||r.right>b.right+1)return false;}}return true;}),label+': version is not clipped');
+        const iconMatches = await page.evaluate(() => {
+          const icon = document.querySelector('.brand-mark img');
+          const favicon = document.querySelector('link[rel="icon"]');
+          return Boolean(icon && favicon && icon.src === favicon.href && icon.complete && icon.naturalWidth > 0);
+        });
+        assert.ok(iconMatches, label + ': header icon renders the exact favicon');
+        const titleMetrics = () => page.evaluate(() => {
+          const title = document.querySelector('.brand-name');
+          const lead = document.querySelector('#pageTitle');
+          const rect = el => el.getBoundingClientRect();
+          return {
+            brandFontSize: getComputedStyle(title).fontSize,
+            brandFontFamily: getComputedStyle(title).fontFamily,
+            brandHeight: rect(title).height,
+            pageFontSize: getComputedStyle(lead).fontSize,
+            pageHeight: rect(lead).height,
+            pageVisible: rect(lead).height > 0,
+            titleFits: document.querySelector('.brand-title').scrollWidth <= document.querySelector('.brand-title').clientWidth + 1
+          };
+        });
+        const beforeTitle = await titleMetrics();
+        assert.ok(beforeTitle.titleFits, label + ': Pocket Level title is not clipped');
+        await page.locator('#languageButton').click();
+        const afterTitle = await titleMetrics();
+        assert.equal(afterTitle.brandFontSize, beforeTitle.brandFontSize, label + ': brand title font size is language-independent');
+        assert.equal(afterTitle.brandFontFamily, beforeTitle.brandFontFamily, label + ': brand title font family is language-independent');
+        assert.equal(afterTitle.brandHeight, beforeTitle.brandHeight, label + ': brand title height is language-independent');
+        assert.equal(afterTitle.pageFontSize, beforeTitle.pageFontSize, label + ': page title font size is language-independent');
+        if (beforeTitle.pageVisible) {
+          assert.ok(Math.abs(afterTitle.pageHeight - beforeTitle.pageHeight) <= 1, label + ': page title remains the same number of lines');
+        }
+        assert.ok(afterTitle.titleFits, label + ': Pocket Level title fits after changing language');
+        await page.locator('#languageButton').click();
+
         const badge = page.locator(cfg.badge);
         assert.equal((await badge.textContent()).trim(), language === 'ja' ? cfg.ja : cfg.en, label + ': privacy text');
         const visible = width > cfg.hide && !(cfg.slug === 'pocket-level' && height <= 520 && width >= height);

@@ -48,7 +48,7 @@ Users often need a spirit level only briefly and do not want to install a native
 
 ## 6. UX decisions
 
-- The primary screen exposes mode switching, the current reference, zero, Hold, 2-second average, automatic capture, and Settings. The active phone layout reduces introductory text.
+- The primary screen exposes mode switching, zero, Hold, 2-second average, automatic capture, and Settings. On phones, the measurement screen omits introductory text and auxiliary cards, uses three dock actions, and places Settings in the header. The reference row is shown only when a custom zero is active; desktop keeps its information panels.
 - Advanced calibration stays in Settings; the existing average is also available beside Hold.
 - Smartphone layout should feel like a native measuring instrument, with large visual feedback and a thumb-friendly sticky control dock.
 - Header language and help controls are icon/text-only without filled backgrounds. Japanese UI shows `EN`; English UI shows `JA`. The language target and Help accessible name / tooltip use the current UI language. The Japanese local-processing badge reads `完全ローカル処理`.

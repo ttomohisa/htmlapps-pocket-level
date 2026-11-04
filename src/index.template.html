@@ -33,7 +33,7 @@
       --safe-bottom:max(12px,env(safe-area-inset-bottom));
     }
     *{box-sizing:border-box}
-    html{min-height:100%;background:var(--bg);scroll-behavior:smooth}
+    html{min-height:100%;background:var(--bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
     body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Yu Gothic UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
     html:has(dialog:modal), body:has(dialog:modal) { overflow: hidden; }
     button,input,select{font:inherit;color:inherit}
@@ -42,10 +42,10 @@
     .app-header{position:sticky;z-index:30;top:0;min-height:var(--header-height);border-bottom:1px solid color-mix(in srgb,var(--line) 82%,transparent);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(16px) saturate(1.2)}
     .header-inner{width:min(980px,100%);min-height:var(--header-height);margin:0 auto;padding:10px clamp(14px,2.8vw,30px);display:flex;align-items:center;gap:14px}
     .brand{display:flex;align-items:center;gap:10px;min-width:0}
-    .brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:0 0 auto;border-radius:11px;background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
-    .brand-mark svg{width:22px;height:22px;display:block}
+    .brand-mark{display:block;width:38px;height:38px;flex:0 0 auto;border-radius:11px;overflow:hidden;box-shadow:var(--shadow-sm)}
+    .brand-mark img{display:block;width:100%;height:100%}
     .brand-copy{min-width:0}
-    .brand-name{margin:0;font-size:17px;line-height:1.2;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-name{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.2;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .version-badge{display:inline-flex;align-items:center;margin-left:7px;padding:1px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface-muted);font-size:10px;font-weight:650;vertical-align:2px}
     .brand-meta{margin:2px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .header-actions{margin-left:auto;display:flex;align-items:center;gap:13px}
@@ -57,10 +57,10 @@
     .header-icon-button svg{width:20px;height:20px}
     .main{width:min(980px,100%);margin:0 auto;padding:18px clamp(14px,2.8vw,30px) 46px}
     .page-intro{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:0 2px 14px}
-    .page-intro h2{margin:0;font-size:clamp(20px,4vw,25px);line-height:1.3;letter-spacing:-.025em}
+    .page-intro h2{margin:0;font-size:24px;line-height:1.3;letter-spacing:-.025em}
     .page-intro p{margin:5px 0 0;max-width:640px;color:var(--muted);font-size:13px}
     .privacy-badge{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:7px 10px;border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));border-radius:999px;color:var(--accent);background:var(--accent-soft);font-size:11px;font-weight:750;white-space:nowrap}
-    .privacy-badge svg{width:14px;height:14px}
+    .privacy-badge svg{width:15px;height:15px;display:block}
     .level-app{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start}
     .meter-card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:var(--shadow-sm)}
     .meter-top{padding:15px 15px 0}
@@ -173,20 +173,130 @@
       .version-badge { flex: 0 0 auto; white-space: nowrap; }
       .header-actions { flex: 0 0 auto; }
     }
+
+    /* Mobile measuring surface: treat the phone as an instrument, not a dashboard. */
+    .mobile-settings-button{display:none}
+    @media(max-width:760px){
+      :root{--header-height:56px}
+      .header-inner{min-height:56px;padding:6px clamp(8px,2.5vw,14px);gap:6px}
+      .brand{gap:7px}
+      .brand-mark{width:32px;height:32px;border-radius:9px;box-shadow:none}
+      .brand-name{font-size:15px}
+      .version-badge{margin-left:4px;padding:1px 4px;font-size:9px}
+      .header-actions{gap:0}
+      .language-button,.header-icon-button{display:grid;place-items:center;min-width:40px;height:44px;padding:0}
+      .header-actions .mobile-settings-button{display:grid}
+      .main{padding:0 14px calc(94px + env(safe-area-inset-bottom))}
+      .page-intro{display:none}
+      .level-app{display:block}
+      .info-panel{display:none}
+      .meter-card{border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+      .meter-top{padding:12px 0 0}
+      .mode-switch{padding:3px;border-radius:10px;background:#e9ece9}
+      .mode-button{min-height:42px;padding:7px 8px;border-radius:8px;font-size:14px;font-weight:650}
+      .mode-button[aria-selected="true"]{box-shadow:0 1px 3px rgba(25,28,24,.09)}
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{
+        height:calc(100svh - 208px);
+        height:calc(100dvh - 208px);
+        min-height:340px;max-height:none;
+        padding:12px 0 10px;justify-content:center
+      }
+      .meter-visual,html[data-measuring="true"] .meter-visual{
+        width:min(78vw,310px,42svh);flex:0 0 auto
+      }
+      .reading{margin-top:clamp(7px,1.7svh,16px)}
+      .reading-value,html[data-measuring="true"] .reading-value{
+        font-size:clamp(55px,10svh,82px);font-weight:750;letter-spacing:-.055em
+      }
+      .reading-unit{font-size:23px}
+      .sensor-stage:not(.edge-mode) .reading-sub{display:none}
+      .reading-sub{margin-top:6px;min-height:0;font-size:13px}
+      .axis-readings{margin-top:8px;gap:22px}
+      .axis-chip{min-width:0;padding:0;border:0;border-radius:0;background:none;color:var(--muted);font-size:13px;white-space:nowrap}
+      .axis-chip strong{font-size:14px;font-weight:700;color:var(--text)}
+      .reference-row{display:none;margin:0 0 6px;gap:8px;font-size:12px}
+      .has-relative-reference .reference-row{display:flex}
+      .reference-reset{min-height:36px;padding:6px 10px}
+      .stage-status,html[data-measuring="true"] .stage-status{
+        min-height:26px;margin-top:12px;gap:8px;font-size:13px;font-weight:600
+      }
+      .stage-status.stable{font-weight:700}
+      .capture-controls{min-height:40px;margin:2px 0 0}
+      .capture-controls .button{
+        min-height:40px;padding:5px 10px;border:0;background:transparent;
+        box-shadow:none;color:var(--muted);font-size:12px;font-weight:600
+      }
+      .capture-controls .button:hover{border:0;background:transparent;color:var(--accent)}
+      .capture-status{margin:0;min-height:18px;font-size:12px}
+      .edge-mode .meter-visual{width:100%;height:112px;aspect-ratio:auto}
+      .edge-vial{width:min(100%,390px)}
+      .start-overlay{background:var(--bg);backdrop-filter:none;padding:20px 16px}
+      .start-icon{width:56px;height:56px;margin-bottom:14px;border-radius:14px}
+      .start-icon svg{width:29px;height:29px}
+      .start-box h3{font-size:18px}
+      .start-box p{font-size:13px}
+      .control-dock{
+        position:fixed;left:0;right:0;bottom:0;z-index:26;
+        display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:4px;margin:0;padding:7px 12px max(9px,env(safe-area-inset-bottom));
+        border:0;border-top:1px solid var(--line);border-radius:0;
+        background:var(--surface);backdrop-filter:none;
+        box-shadow:0 -4px 18px rgba(25,28,24,.06)
+      }
+      .control-dock #settingsButton{display:none}
+      .dock-button{min-height:58px;padding:6px 4px;gap:4px;border-radius:9px;font-size:12px}
+      .dock-button svg{width:22px;height:22px}
+      .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+    }
+    @media(max-width:760px) and (orientation:portrait) and (max-height:650px){
+      /* On short phones, let the stage grow rather than overlap the mode tabs. */
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{height:auto;min-height:0;justify-content:flex-start;padding-top:12px}
+      .meter-visual,html[data-measuring="true"] .meter-visual{width:min(72vw,31svh)}
+    }
+    @media(max-width:760px) and (orientation:landscape) and (max-height:520px){
+      /* A sticky header otherwise blocks the mode tabs on very short screens. */
+      .app-header{position:static}
+      .main{padding-top:4px}
+      /* Keep the start prompt inside the stage rather than over the mode tabs. */
+      .start-overlay{padding:8px 10px;overflow:hidden;align-items:center;justify-content:center}
+      .start-box{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:8px;width:100%;max-width:none;text-align:left}
+      .start-icon{display:none}
+      .start-box h3{grid-column:1;grid-row:1;margin:0 0 3px;font-size:14px}
+      .start-box p{grid-column:1;grid-row:2;margin:0;font-size:11px;line-height:1.35}
+      .start-box .start-button{grid-column:2;grid-row:1 / span 2;min-width:96px;min-height:44px;padding:6px 9px;font-size:12px}
+      .meter-top{padding-top:4px}
+      .sensor-stage,html[data-measuring="true"] .sensor-stage{
+        display:grid;grid-template-columns:minmax(120px,35%) minmax(0,1fr);
+        gap:0 12px;align-items:center;height:auto;min-height:172px;padding:6px 0
+      }
+      .sensor-stage .meter-visual,html[data-measuring="true"] .sensor-stage .meter-visual{
+        grid-column:1;grid-row:1 / span 4;width:min(35svh,165px);justify-self:center
+      }
+      .sensor-stage .reading{grid-column:2;grid-row:1;margin-top:0}
+      .sensor-stage .stage-status{grid-column:2;grid-row:2;margin-top:4px}
+      .sensor-stage .capture-controls{grid-column:2;grid-row:3}
+      .sensor-stage .capture-status{grid-column:2;grid-row:4}
+      .sensor-stage.edge-mode .meter-visual{width:100%;height:92px}
+      .sensor-stage.edge-mode .edge-vial{height:76px}
+      .sensor-stage.edge-mode .edge-bubble{width:52px;height:52px}
+      .reading-value,html[data-measuring="true"] .reading-value{font-size:clamp(45px,14svh,64px)}
+      .axis-readings{display:none}
+    }
   </style>
 </head>
 <body>
   <header class="app-header">
     <div class="header-inner">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="7.5" width="19" height="9" rx="4.5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M7 5.5v13M17 5.5v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/></svg></div>
+        <div class="brand-mark" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316624f'/%3E%3Crect x='11' y='23' width='42' height='18' rx='9' fill='none' stroke='white' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='6' fill='white'/%3E%3Cpath d='M20 20v24M44 20v24' stroke='white' stroke-width='3' stroke-linecap='round' opacity='.72'/%3E%3C/svg%3E" alt=""></div>
         <div class="brand-copy">
-          <h1 class="brand-name"><span class="brand-title">Pocket Level</span><span class="version-badge" id="versionBadge">v1.1.1</span></h1>
-          <p class="brand-meta" data-i18n="brandMeta">スマホが、そのまま水平器に。</p>
+          <h1 class="brand-name"><span class="brand-title">Pocket Level</span><span class="version-badge" id="versionBadge">v1.2.0</span></h1>
+          <p class="brand-meta" data-i18n="brandMeta">スマホを水平器に</p>
         </div>
       </div>
       <div class="header-actions">
         <button type="button" class="language-button" id="languageButton" aria-label="英語に切り替え" title="英語に切り替え">EN</button>
+        <button type="button" class="header-icon-button mobile-settings-button" id="mobileSettingsButton" aria-label="設定" title="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.775 5.152 L10.350 2.644 L13.650 2.644 L14.225 5.152 L15.269 5.585 L17.449 4.218 L19.782 6.551 L18.415 8.731 L18.848 9.775 L21.356 10.350 L21.356 13.650 L18.848 14.225 L18.415 15.269 L19.782 17.449 L17.449 19.782 L15.269 18.415 L14.225 18.848 L13.650 21.356 L10.350 21.356 L9.775 18.848 L8.731 18.415 L6.551 19.782 L4.218 17.449 L5.585 15.269 L5.152 14.225 L2.644 13.650 L2.644 10.350 L5.152 9.775 L5.585 8.731 L4.218 6.551 L6.551 4.218 L8.731 5.585 Z"/><circle cx="12" cy="12" r="3"/></svg></button>
         <button type="button" class="header-icon-button" id="helpButton" aria-label="使い方と注意事項" title="使い方と注意事項"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.8 9.2a2.4 2.4 0 0 1 4.6.9c0 1.8-2.4 2-2.4 3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></button>
       </div>
     </div>
@@ -196,10 +306,10 @@
   <main class="main">
     <section class="page-intro" aria-labelledby="pageTitle">
       <div>
-        <h2 id="pageTitle" data-i18n="pageTitle">置くだけ、当てるだけ。スマホで水平を確認。</h2>
-        <p data-i18n="pageLead">端末のモーションセンサーだけを使って、平面の水平・辺の傾きを測ります。測定データは外部へ送信しません。</p>
+        <h2 id="pageTitle" data-i18n="pageTitle">スマホで水平と傾きを確認</h2>
+        <p data-i18n="pageLead">スマホの傾きセンサーで、平面や辺の傾きを測ります。</p>
       </div>
-      <div class="privacy-badge"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span data-i18n="localOnly">完全ローカル処理</span></div>
+      <div class="privacy-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg><span data-i18n="localOnly">完全ローカル処理</span></div>
     </section>
 
     <div class="level-app">
@@ -242,7 +352,7 @@
             <div class="start-box">
               <div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/></svg></div>
               <h3 data-i18n="startTitle">モーションセンサーを使います</h3>
-              <p id="startDescription" data-i18n="startDescription">測定を開始すると、端末の傾き情報へのアクセスを要求する場合があります。位置情報・カメラ・ネットワークは使用しません。</p>
+              <p id="startDescription" data-i18n="startDescription">傾きセンサーを使います。ブラウザーによっては許可が必要です。</p>
               <button type="button" class="button primary start-button" id="startButton" data-i18n="startMeasure">測定を開始</button>
             </div>
           </div>
@@ -338,7 +448,6 @@
       <!-- APP:HELP:BEGIN -->
       <h3 data-i18n="helpBasicTitle">基本操作</h3>
       <ul><li data-i18n="helpBasic1">「測定を開始」を押してセンサー権限を許可します。</li><li data-i18n="helpBasic2">平面モードはスマホを画面上向きで面に置きます。気泡が中央に来れば水平です。</li><li data-i18n="helpBasic3">辺・垂直モードは端末の長辺または短辺を面に当て、1軸の傾きを確認します。</li><li data-i18n="helpBasic4">「ゼロ設定」は現在の角度を0°として扱います。「固定」は読み値を一時停止します。</li></ul>
-      <p data-i18n="helpDialogScroll">「閉じる」、Esc、外側のクリックで閉じます。</p>
       <h3 data-i18n="helpPrecisionTitle">校正と精密測定</h3>
       <p data-i18n="helpPrecisionText">通常はそのまま使えます。端末固有のズレが気になる場合は、設定の「180°反転の2点校正」を使ってください。「2秒平均」は短時間の揺れを平均して読み値を固定します。</p>
       <h3 data-i18n="helpPrivacyTitle">プライバシー</h3>
@@ -368,18 +477,18 @@
     const translations = {
       ja: {
         absoluteReference:'水平が基準',edgeAbsoluteReference:'水平・垂直が基準',levelOrPlumbNow:'水平・垂直です',relativeReference:'保存した角度が基準',referenceMatched:'基準と一致',resetReferenceQuick:'基準を戻す',quickAverage:'2秒平均',autoCapture:'安定したら自動固定',cancelCapture:'測定をキャンセル',autoPlace:'端末を置いて、手を離してください',autoWait:'動かさずにお待ちください…',autoDone:'安定した読み値を固定しました',autoTimeout:'安定した値を取得できませんでした。置き直してお試しください。',captureCancelled:'測定をキャンセルしました',invalidSurface:'基準や校正値を確認してください。基準を戻すか、校正をやり直してください。',surfacePosture:'画面を上向きにしてください',verticalSlope:'90°以上の勾配は表示できません',legacyEdgeReset:'以前の辺のゼロ基準をリセットしました。必要に応じて再設定してください。',
-        brandMeta:'スマホが、そのまま水平器に。',pageTitle:'置くだけ、当てるだけ。スマホで水平を確認。',pageLead:'端末のモーションセンサーだけを使って、平面の水平・辺の傾きを測ります。測定データは外部へ送信しません。',localOnly:'完全ローカル処理',flatMode:'平面',edgeMode:'辺・垂直',waiting:'センサー待機中',startTitle:'モーションセンサーを使います',startDescription:'測定を開始すると、端末の傾き情報へのアクセスを要求する場合があります。位置情報・カメラ・ネットワークは使用しません。',startMeasure:'測定を開始',setZero:'ゼロ設定',hold:'固定',resume:'再開',settings:'設定',currentInfo:'現在の測定',tolerance:'水平判定',slope:'勾配',stability:'安定度',reference:'基準',factoryZero:'標準',customZero:'ゼロ設定済み',betterMeasure:'測りやすくするコツ',tipCase:'ケースやカメラの出っ張りで端末が浮く場合は、同じ条件で校正してください。',tipStable:'「安定」と表示されてから値を読むと、手ブレの影響を減らせます。',tipPrecision:'より丁寧に測るときは、下の「2秒平均」で読み値を固定できます。',footerPrivacy:'センサーデータは端末内でのみ処理されます。',
+        brandMeta:'スマホを水平器に',pageTitle:'スマホで水平と傾きを確認',pageLead:'スマホの傾きセンサーで、平面や辺の傾きを測ります。',localOnly:'完全ローカル処理',flatMode:'平面',edgeMode:'辺・垂直',waiting:'センサー待機中',startTitle:'モーションセンサーを使います',startDescription:'傾きセンサーを使います。ブラウザーによっては許可が必要です。',startMeasure:'測定を開始',setZero:'ゼロ設定',hold:'固定',resume:'再開',settings:'設定',currentInfo:'現在の測定',tolerance:'水平判定',slope:'勾配',stability:'安定度',reference:'基準',factoryZero:'標準',customZero:'ゼロ設定済み',betterMeasure:'測りやすくするコツ',tipCase:'ケースやカメラの出っ張りで端末が浮く場合は、同じ条件で校正してください。',tipStable:'「安定」と表示されてから値を読むと、手ブレの影響を減らせます。',tipPrecision:'より丁寧に測るときは、下の「2秒平均」で読み値を固定できます。',footerPrivacy:'センサーデータは端末内でのみ処理されます。',
         primaryReadout:'大きく表示する値',angleReadout:'角度 (°)',slopeReadout:'勾配 (%)',primaryReadoutHelp:'数値の表示だけを切り替えます。水平判定は角度が基準です。',toleranceSetting:'水平とみなす範囲',toleranceHelp:'この角度以内になると、水平として強調表示します。',vibration:'水平時に振動',vibrationHelp:'対応端末では、水平になった瞬間だけ短く振動します。',sound:'水平時に音',soundHelp:'画面を見づらい姿勢でも、水平になったことを音で知らせます。',wakeLock:'測定中は画面を消さない',wakeLockHelp:'対応ブラウザーのHTTPS表示時に有効です。',precisionMeasure:'2秒平均で精密測定',precisionHelp:'2秒間の読み値を平均し、結果を固定します。細かな揺れを抑えたいときに使います。',startPrecision:'2秒平均を開始',flipCalibration:'180°反転の2点校正',flipCalibrationHelp:'完全に水平な基準面がなくても、同じ面で端末を180°回して2回測ることで端末側の偏りを推定します。',openCalibration:'校正する',resetCalibration:'校正をリセット',resetReference:'ゼロ基準をリセット',resetReferenceHelp:'現在のモードで保存したゼロ基準を標準に戻します。',resetZero:'ゼロ基準を戻す',
         calibrationTitle:'180°反転の2点校正',calibrationIntro:'端末を同じ面に置いたまま180°回して2回記録します。面そのものの傾きを打ち消して、端末側のズレを推定します。',calStep1Title:'1. 端末を面に置く',calStep1Text:'画面を上向きにして置き、端末が動かなくなってから記録してください。',recordFirst:'1回目を記録',calStep2Title:'2. その場で180°回す',calStep2Text:'端末を裏返さず、同じ面の上で上下を入れ替えるように180°回転してください。',recordSecond:'2回目を記録',calibrationLimit:'※ ケースやカメラ部の出っ張りで接地状態が変わる場合、完全には補正できません。精密工具の代替ではありません。',
-        helpDialogScroll: "「閉じる」、Esc、外側のクリックで閉じます。",helpTitle:'使い方と注意事項',helpBasicTitle:'基本操作',helpBasic1:'「測定を開始」を押してセンサー権限を許可します。',helpBasic2:'平面モードはスマホを画面上向きで面に置きます。気泡が中央に来れば水平です。',helpBasic3:'辺・垂直モードは端末の長辺または短辺を面に当て、1軸の傾きを確認します。',helpBasic4:'「ゼロ設定」は現在の角度を基準にします。同じ向き・接地面で比べてください。「固定」は読み値を止めます。「自動固定」は、端末を置いて手を離すと安定した値を固定します。',helpPrecisionTitle:'校正と精密測定',helpPrecisionText:'通常はそのまま使えます。端末固有のズレが気になる場合は、設定の「180°反転の2点校正」を使ってください。「2秒平均」は短時間の揺れを平均して読み値を固定します。',helpPrivacyTitle:'プライバシー',helpPrivacyText:'使用するのは端末の傾き・加速度センサーだけです。位置情報、カメラ、マイクは使いません。測定値と設定は外部へ送信されません。設定と校正値はLocalStorageが利用できる場合のみ端末内に保存されます。',helpLimitTitle:'注意事項',helpLimit1:'端末のセンサー精度、ケース、カメラの出っ張り、接地状態により誤差が生じます。施工検査など精度保証が必要な用途では専用の測定器を使用してください。',helpLimit2:'ブラウザーによってはセンサー利用にHTTPSと明示的な権限が必要です。file://で開いた場合、画面は表示できても測定できないことがあります。',helpLimit3:'画面起動ロックと振動は未対応ブラウザーでは自動的に無効になります。',
+        helpTitle:'使い方と注意事項',helpBasicTitle:'基本操作',helpBasic1:'「測定を開始」を押してセンサー権限を許可します。',helpBasic2:'平面モードはスマホを画面上向きで面に置きます。気泡が中央に来れば水平です。',helpBasic3:'辺・垂直モードは端末の長辺または短辺を面に当て、1軸の傾きを確認します。',helpBasic4:'「ゼロ設定」は現在の角度を基準にします。同じ向き・接地面で比べてください。「固定」は読み値を止めます。「自動固定」は、端末を置いて手を離すと安定した値を固定します。',helpPrecisionTitle:'校正と精密測定',helpPrecisionText:'通常はそのまま使えます。端末固有のズレが気になる場合は、設定の「180°反転の2点校正」を使ってください。「2秒平均」は短時間の揺れを平均して読み値を固定します。',helpPrivacyTitle:'プライバシー',helpPrivacyText:'使用するのは端末の傾き・加速度センサーだけです。位置情報、カメラ、マイクは使いません。測定値と設定は外部へ送信されません。設定と校正値はLocalStorageが利用できる場合のみ端末内に保存されます。',helpLimitTitle:'注意事項',helpLimit1:'端末のセンサー精度、ケース、カメラの出っ張り、接地状態により誤差が生じます。施工検査など精度保証が必要な用途では専用の測定器を使用してください。',helpLimit2:'ブラウザーによってはセンサー利用にHTTPSと明示的な権限が必要です。file://で開いた場合、画面は表示できても測定できないことがあります。',helpLimit3:'画面起動ロックと振動は未対応ブラウザーでは自動的に無効になります。',
         sensorActive:'測定中',sensorStable:'安定',sensorMoving:'測定中',sensorLocked:'読み値を固定中',sensorChecking:'センサーを確認中…',sensorCheckingDescription:'端末の傾き情報を待っています。値を取得できるまで測定画面には切り替わりません。',sensorUnavailableButton:'この環境では利用できません',sensorNoData:'センサー値を取得できませんでした。ブラウザーのモーションセンサー権限を確認して、ページを再読み込みしてください。',sensorLocalUnavailable:'このブラウザーではローカルHTMLからセンサー値を取得できませんでした。Browser KittyなどHTTPSのページで開いてください。',sensorPermissionDenied:'モーションセンサーの利用が許可されていません。ブラウザーのサイト設定で許可してからページを再読み込みしてください。',sensorUnsupported:'このブラウザー／端末ではモーションセンサーを利用できません。',sensorNeedsHttps:'この開き方ではモーションセンサーを利用できません。HTTPSのページで開いてください。',edgePosture:'端末を辺で立ててください',levelNow:'水平です',notLevel:'{value}° 傾いています',stabilityGood:'安定',stabilityFair:'やや揺れ',stabilityMoving:'動いています',zeroSet:'現在の角度を0°に設定しました',zeroReset:'ゼロ基準を標準に戻しました',locked:'読み値を固定しました',unlocked:'測定を再開しました',precisionRunning:'2秒間の平均を測定しています…',precisionDone:'2秒平均を固定しました',precisionFailed:'十分なセンサーデータを取得できませんでした',precisionResult:'2秒平均 · ばらつき ±{spread}°',calibrated:'校正済み · X {x}° / Y {y}°',notCalibrated:'未校正',calCapture:'記録中…端末を動かさないでください',calFirstDone:'1回目を記録しました。端末を180°回してください。',calDone:'2点校正を保存しました',calReset:'校正値をリセットしました',calResetTitle:'校正をリセットしますか？',calResetMessage:'校正の補正値と、その校正で設定したゼロ基準をリセットします。',cancel:'キャンセル',reset:'リセット',close:'閉じる',wakeUnavailable:'この環境では画面起動ロックを利用できません',languageName:'EN',switchLanguage:'英語に切り替え'
       },
       en: {
         absoluteReference:'Absolute level',edgeAbsoluteReference:'Level / plumb',levelOrPlumbNow:'Level / plumb',relativeReference:'Relative to saved angle',referenceMatched:'Matches reference',resetReferenceQuick:'Reset reference',quickAverage:'2s average',autoCapture:'Capture when stable',cancelCapture:'Cancel capture',autoPlace:'Place the phone, then take your hand away',autoWait:'Keep the phone still…',autoDone:'Stable reading held',autoTimeout:'We could not get a stable reading. Reposition the phone and try again.',captureCancelled:'Capture cancelled',invalidSurface:'Check the reference or calibration. Reset the reference or calibrate again.',surfacePosture:'Keep the screen facing up',verticalSlope:'Slope is unavailable at 90° or beyond',legacyEdgeReset:'Your old Edge zero reference was reset. Set it again if needed.',
-        brandMeta:'A level that is already in your pocket.',pageTitle:'Set it down or hold it against an edge. Check level instantly.',pageLead:'Measure flat surfaces and edges using only your phone’s motion sensors. Measurement data never leaves the page.',localOnly:'Fully local processing',flatMode:'Surface',edgeMode:'Edge / plumb',waiting:'Waiting for sensors',startTitle:'Use motion sensors',startDescription:'Starting measurement may ask for access to device motion. Location, camera, microphone, and network access are not used.',startMeasure:'Start measuring',setZero:'Set zero',hold:'Hold',resume:'Resume',settings:'Settings',currentInfo:'Current measurement',tolerance:'Level tolerance',slope:'Slope',stability:'Stability',reference:'Reference',factoryZero:'Default',customZero:'Custom zero',betterMeasure:'Tips for better readings',tipCase:'If a case or camera bump lifts the phone, calibrate with the phone in the same physical setup.',tipStable:'Read the value after “Stable” appears to reduce hand-movement noise.',tipPrecision:'For a careful reading, use the 2-second average beside Hold.',footerPrivacy:'Sensor readings are processed only on this device.',
+        brandMeta:'Use your phone as a level.',pageTitle:'Check level and tilt with your phone.',pageLead:'Measure the tilt of surfaces and edges with your phone.',localOnly:'Fully local processing',flatMode:'Surface',edgeMode:'Edge / plumb',waiting:'Waiting for sensors',startTitle:'Use motion sensors',startDescription:'Uses motion sensors. Your browser may ask for permission.',startMeasure:'Start measuring',setZero:'Set zero',hold:'Hold',resume:'Resume',settings:'Settings',currentInfo:'Current measurement',tolerance:'Level tolerance',slope:'Slope',stability:'Stability',reference:'Reference',factoryZero:'Default',customZero:'Custom zero',betterMeasure:'Tips for better readings',tipCase:'If a case or camera bump lifts the phone, calibrate with the phone in the same physical setup.',tipStable:'Read the value after “Stable” appears to reduce hand-movement noise.',tipPrecision:'For a careful reading, use the 2-second average beside Hold.',footerPrivacy:'Sensor readings are processed only on this device.',
         primaryReadout:'Primary reading',angleReadout:'Angle (°)',slopeReadout:'Slope (%)',primaryReadoutHelp:'Changes the number display only. Level tolerance is still measured in degrees.',toleranceSetting:'Level tolerance',toleranceHelp:'The meter highlights level when the reading is within this angle.',vibration:'Vibrate when level',vibrationHelp:'On supported devices, vibrate briefly only when the meter enters the level zone.',sound:'Sound when level',soundHelp:'Hear when the surface reaches level even when the display is hard to see.',wakeLock:'Keep screen awake while measuring',wakeLockHelp:'Available on supported browsers when served over HTTPS.',precisionMeasure:'Precision 2-second average',precisionHelp:'Average readings for two seconds and hold the result to reduce small sensor fluctuations.',startPrecision:'Start 2-second average',flipCalibration:'180° two-point calibration',flipCalibrationHelp:'Estimate device-side bias by measuring twice on the same surface after rotating the phone 180°, even without a perfectly level reference.',openCalibration:'Calibrate',resetCalibration:'Reset calibration',resetReference:'Reset zero reference',resetReferenceHelp:'Return to the default reference for the current mode.',resetZero:'Reset zero',
         calibrationTitle:'180° two-point calibration',calibrationIntro:'Record twice on the same surface after rotating the phone 180°. The surface tilt is canceled to estimate device-side bias.',calStep1Title:'1. Place the phone on the surface',calStep1Text:'Keep the screen facing up and wait until the phone stops moving.',recordFirst:'Record first position',calStep2Title:'2. Rotate it 180° in place',calStep2Text:'Do not flip the phone. Rotate it on the same surface so the top and bottom swap directions.',recordSecond:'Record second position',calibrationLimit:'Cases and camera bumps can change the contact geometry, so calibration cannot remove every source of error. This is not a replacement for certified precision tools.',
-        helpDialogScroll: "Use Close, Esc, or click outside the dialog to close it.",helpTitle:'How to use & notes',helpBasicTitle:'Basic use',helpBasic1:'Tap “Start measuring” and allow motion-sensor access if requested.',helpBasic2:'In Surface mode, place the phone screen-up. The surface is level when the bubble is centered.',helpBasic3:'In Edge / plumb mode, rest a long or short edge of the phone against the surface and read the single-axis tilt.',helpBasic4:'“Set zero” saves the current angle as a reference. Compare with the same phone direction and contact face. “Hold” freezes the reading. “Capture when stable” lets you place the phone and take your hand away before the reading is held.',helpPrecisionTitle:'Calibration & precision',helpPrecisionText:'Normal use needs no calibration. If device-specific bias is noticeable, use 180° two-point calibration. The 2-second average reduces short-term fluctuations and holds the result.',helpPrivacyTitle:'Privacy',helpPrivacyText:'Only device tilt/motion sensors are used. Location, camera, and microphone are not used. Readings are not sent anywhere. Preferences and calibration values are stored only in localStorage when available.',helpLimitTitle:'Important notes',helpLimit1:'Sensor accuracy, cases, camera bumps, and how the phone contacts the surface can introduce error. Use dedicated measuring equipment for work that requires certified accuracy.',helpLimit2:'Some browsers require HTTPS and explicit permission for sensor access. A file:// copy may open correctly but may not receive sensor readings. When sensor access is unavailable, the app shows the reason and disables Start.',helpLimit3:'Wake Lock and vibration silently fall back when unsupported.',
+        helpTitle:'How to use & notes',helpBasicTitle:'Basic use',helpBasic1:'Tap “Start measuring” and allow motion-sensor access if requested.',helpBasic2:'In Surface mode, place the phone screen-up. The surface is level when the bubble is centered.',helpBasic3:'In Edge / plumb mode, rest a long or short edge of the phone against the surface and read the single-axis tilt.',helpBasic4:'“Set zero” saves the current angle as a reference. Compare with the same phone direction and contact face. “Hold” freezes the reading. “Capture when stable” lets you place the phone and take your hand away before the reading is held.',helpPrecisionTitle:'Calibration & precision',helpPrecisionText:'Normal use needs no calibration. If device-specific bias is noticeable, use 180° two-point calibration. The 2-second average reduces short-term fluctuations and holds the result.',helpPrivacyTitle:'Privacy',helpPrivacyText:'Only device tilt/motion sensors are used. Location, camera, and microphone are not used. Readings are not sent anywhere. Preferences and calibration values are stored only in localStorage when available.',helpLimitTitle:'Important notes',helpLimit1:'Sensor accuracy, cases, camera bumps, and how the phone contacts the surface can introduce error. Use dedicated measuring equipment for work that requires certified accuracy.',helpLimit2:'Some browsers require HTTPS and explicit permission for sensor access. A file:// copy may open correctly but may not receive sensor readings. When sensor access is unavailable, the app shows the reason and disables Start.',helpLimit3:'Wake Lock and vibration silently fall back when unsupported.',
         sensorActive:'Measuring',sensorStable:'Stable',sensorMoving:'Measuring',sensorLocked:'Reading held',sensorChecking:'Checking sensors…',sensorCheckingDescription:'Waiting for device tilt data. The measurement screen will appear only after real sensor values are received.',sensorUnavailableButton:'Unavailable in this environment',sensorNoData:'No sensor values were received. Check motion-sensor permission in your browser, then reload the page.',sensorLocalUnavailable:'This browser did not provide sensor values to a local HTML file. Open the app from an HTTPS page such as Browser Kitty.',sensorPermissionDenied:'Motion-sensor access is not allowed. Enable it in the browser site settings, then reload the page.',sensorUnsupported:'Motion sensors are not available on this browser or device.',sensorNeedsHttps:'Motion sensors are not available with this page context. Open the app over HTTPS.',edgePosture:'Stand the phone on one of its edges',levelNow:'Level',notLevel:'Tilted by {value}°',stabilityGood:'Stable',stabilityFair:'Slight movement',stabilityMoving:'Moving',zeroSet:'Current reading is now the zero reference',zeroReset:'Zero reference returned to default',locked:'Reading held',unlocked:'Measurement resumed',precisionRunning:'Averaging for two seconds…',precisionDone:'2-second average held',precisionFailed:'Not enough sensor samples were received',precisionResult:'2-second average · spread ±{spread}°',calibrated:'Calibrated · X {x}° / Y {y}°',notCalibrated:'Not calibrated',calCapture:'Recording… keep the phone still',calFirstDone:'First position recorded. Rotate the phone 180°.',calDone:'Two-point calibration saved',calReset:'Calibration reset',calResetTitle:'Reset calibration?',calResetMessage:'This resets the calibration offsets and zero references set with that calibration.',cancel:'Cancel',reset:'Reset',close:'Close',wakeUnavailable:'Wake Lock is not available in this environment',languageName:'JA',switchLanguage:'Switch to Japanese'
       }
     };
@@ -553,7 +662,7 @@
       els.mainReadingUnit.textContent=state.readout==='slope'?'%':'°';
       els.slopeDisplay.textContent=`${fmt(r.slope)}%`;els.toleranceDisplay.textContent=`±${state.tolerance.toFixed(1)}°`;
       const metric=stabilityMetric();els.stabilityDisplay.textContent=Number.isFinite(metric)?stabilityLabel(metric):'—';
-      els.referenceDisplay.textContent=hasCustomZero()?t('relativeReference'):t(state.mode==='flat'?'absoluteReference':'edgeAbsoluteReference');els.referenceLabel.textContent=els.referenceDisplay.textContent;els.referenceResetButton.hidden=!hasCustomZero();
+      els.referenceDisplay.textContent=hasCustomZero()?t('relativeReference'):t(state.mode==='flat'?'absoluteReference':'edgeAbsoluteReference');els.referenceLabel.textContent=els.referenceDisplay.textContent;els.referenceResetButton.hidden=!hasCustomZero();els.sensorStage.classList.toggle('has-relative-reference',hasCustomZero());
       syncCaptureUI();syncHoldUI();updateStatus(isLevel,metric,r);updateLevelFeedback(isLevel,metric);
     }
     function updateStatus(isLevel,metric,r){els.stageStatus.className='stage-status';let text;if(state.sensorErrorKey){text=t(state.sensorErrorKey);els.stageStatus.classList.add('warning')}else if(state.running&&!state.hasSensorData){text=t('sensorChecking');els.stageStatus.classList.add('warning')}else if(state.hasSensorData&&r.valid===false){text=state.mode==='edge'?t('edgePosture'):r.surfacePosture===false?t('surfacePosture'):t('invalidSurface');els.stageStatus.classList.add('warning')}else if(state.locked){text=t('sensorLocked');els.stageStatus.classList.add('stable')}else if(!state.hasSensorData){text=t('waiting')}else if(state.mode==='edge'&&r.postureOk===false){text=t('edgePosture');els.stageStatus.classList.add('warning')}else if(metric<.08){text=isLevel?t(hasCustomZero()?'referenceMatched':state.mode==='edge'?'levelOrPlumbNow':'levelNow'):t('sensorStable');els.stageStatus.classList.add('stable')}else{text=t('sensorMoving')};if(state.hasSensorData&&r.valid!==false&&state.readout==='slope'&&r.slope===null)text=t('verticalSlope');els.stageStatusText.textContent=text}
@@ -637,7 +746,7 @@
     async function requestWakeLock(){if(!state.running||!state.wakeEnabled||!('wakeLock'in navigator)||document.visibilityState!=='visible')return;try{if(state.wakeLock)return;state.wakeLock=await navigator.wakeLock.request('screen');state.wakeLock.addEventListener('release',()=>{state.wakeLock=null})}catch{state.wakeLock=null}}
     async function releaseWakeLock(){try{await state.wakeLock?.release()}catch{}state.wakeLock=null}
 
-    function updateLanguage(){document.documentElement.lang=state.lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[state.lang][key]!==undefined)el.textContent=t(key)});els.languageButton.textContent=t('languageName');els.languageButton.setAttribute('aria-label',t('switchLanguage'));els.languageButton.title=t('switchLanguage');els.helpButton.setAttribute('aria-label',t('helpTitle'));els.helpButton.title=t('helpTitle');document.querySelectorAll('.dialog-close').forEach(b=>b.setAttribute('aria-label',t('close')));els.holdLabel.textContent=state.locked?t('resume'):t('hold');syncSensorStartUI();updateSettingsUI();renderMeter();persist()}
+    function updateLanguage(){document.documentElement.lang=state.lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[state.lang][key]!==undefined)el.textContent=t(key)});els.languageButton.textContent=t('languageName');els.languageButton.setAttribute('aria-label',t('switchLanguage'));els.languageButton.title=t('switchLanguage');els.helpButton.setAttribute('aria-label',t('helpTitle'));els.helpButton.title=t('helpTitle');els.mobileSettingsButton.setAttribute('aria-label',t('settings'));els.mobileSettingsButton.title=t('settings');document.querySelectorAll('.dialog-close').forEach(b=>b.setAttribute('aria-label',t('close')));els.holdLabel.textContent=state.locked?t('resume'):t('hold');syncSensorStartUI();updateSettingsUI();renderMeter();persist()}
     function updateSettingsUI(){els.primaryReadoutSelect.value=state.readout;document.querySelectorAll('#toleranceButtons button').forEach(b=>b.classList.toggle('active',Number(b.dataset.value)===state.tolerance));els.vibrationToggle.checked=state.vibration;els.soundToggle.checked=state.sound;els.wakeLockToggle.checked=state.wakeEnabled;els.calibrationStatus.textContent=state.calibration.updatedAt?t('calibrated',{x:fmt(state.calibration.biasX,2),y:fmt(state.calibration.biasY,2)}):t('notCalibrated');els.resetCalibrationButton.disabled=!state.calibration.updatedAt;els.resetZeroButton.disabled=!hasCustomZero();updateSensorDependentControls();els.referenceDisplay.textContent=hasCustomZero()?t('customZero'):t('factoryZero')}
     function openDialog(dialog){if(!dialog.open)dialog.showModal()}
     function closeDialog(dialog){if(dialog?.open)dialog.close()}
@@ -649,7 +758,7 @@
 
     els.startButton.addEventListener('click',startSensors);
     els.flatModeButton.addEventListener('click',()=>setMode('flat'));els.edgeModeButton.addEventListener('click',()=>setMode('edge'));
-    els.zeroButton.addEventListener('click',setZero);els.holdButton.addEventListener('click',toggleHold);els.settingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.helpButton.addEventListener('click',()=>openDialog(els.helpDialog));
+    els.zeroButton.addEventListener('click',setZero);els.holdButton.addEventListener('click',toggleHold);els.settingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.mobileSettingsButton.addEventListener('click',()=>{updateSettingsUI();openDialog(els.settingsDialog)});els.helpButton.addEventListener('click',()=>openDialog(els.helpDialog));
     els.languageButton.addEventListener('click',()=>{state.lang=state.lang==='ja'?'en':'ja';updateLanguage()});
     document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>closeDialog(document.getElementById(btn.dataset.closeDialog))));[els.settingsDialog,els.calibrationDialog,els.helpDialog].forEach(d=>d.addEventListener('click',handleBackdrop));
     els.primaryReadoutSelect.addEventListener('change',()=>{const value=els.primaryReadoutSelect.value;if(value==='angle'||value==='slope'){state.readout=value;persist();renderMeter()}els.primaryReadoutSelect.value=state.readout});

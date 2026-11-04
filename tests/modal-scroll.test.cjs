@@ -42,24 +42,27 @@ test('existing bounded dialog and independently scrolling body geometry is uncha
   const baselineCss = css.replace(/#helpDialog \.dialog-body\{[^}]*\}/g, ''); // Scoped Help override is asserted below.
   assert.deepEqual([...baselineCss.matchAll(/\.dialog\-body\s*\{([^}]+)\}/g)].map(match => compact(match[1])), ["padding:18px20pxcalc(22px+env(safe-area-inset-bottom));overflow:auto;max-height:calc(100dvh-78px)", "padding-bottom:18px", "max-height:calc(86dvh-70px)"]);
 });
-test('existing privacy badge uses a decorative shield without changing its wording', () => {
+test('desktop privacy badge uses the Reverse Clip check-shield without changing its wording', () => {
   const badge = html.match(/<div class="privacy-badge">([\s\S]*?)<\/div>/)?.[1];
   assert.ok(badge, 'Existing privacy badge remains');
   assert.match(badge, /<svg[^>]*aria-hidden="true"/);
-  assert.match(badge, /d="M12 3 4 6v5c0 5 3\.4 8\.7 8 10 4\.6-1\.3 8-5 8-10V6l-8-3Z"/);
+  assert.match(badge, /<svg[^>]*stroke-width="1\.9"[^>]*aria-hidden="true"/);
+  assert.match(badge, /d="M12 3 5 6v5c0 4\.6 2\.8 8 7 10 4\.2-2 7-5\.4 7-10V6z"/);
+  assert.match(badge, /d="m9 12 2 2 4-5"/);
   assert.doesNotMatch(badge, /<rect\b/, 'The old padlock body is absent');
   assert.match(badge, /data-i18n="localOnly">完全ローカル処理<\/span>/);
 });
-test('Japanese and English Help retain close routes without layout audit prose', () => {
+test('Help keeps actual close controls without redundant instructions', () => {
   const help = html.match(/APP:HELP:BEGIN([\s\S]*?)APP:HELP:END/)?.[1];
-  assert.match(help || '', /data-i18n="helpDialogScroll"/);
+  assert.ok(help, 'Help dialog is present');
+  assert.doesNotMatch(help, /data-i18n="helpDialogScroll"/);
+  assert.doesNotMatch(help, /「閉じる」、Esc、外側のクリックで閉じます。/);
   const translationsText = html.match(/const translations = (\{[\s\S]*?\n    \});/)?.[1];
   assert.ok(translationsText, 'Real translation object remains available');
   const translations = vm.runInNewContext(`(${translationsText})`);
-  assert.doesNotMatch(translations.ja.helpDialogScroll, /背景.*スクロール/);
-  assert.match(translations.ja.helpDialogScroll, /閉じる.*Esc.*外側/);
-  assert.doesNotMatch(translations.en.helpDialogScroll, /background.*scroll/i);
-  assert.match(translations.en.helpDialogScroll, /Close.*Esc.*outside/);
+  assert.equal(translations.ja.helpDialogScroll, undefined);
+  assert.equal(translations.en.helpDialogScroll, undefined);
+  assert.match(html, /<dialog id="helpDialog"[\s\S]*?data-close-dialog="helpDialog"/, 'The visible Close control remains available');
 });
 
 test('canonical runner includes source and artifact regression checks with failure propagation and environment restoration', () => {
