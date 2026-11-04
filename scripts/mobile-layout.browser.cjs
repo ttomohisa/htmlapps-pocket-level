@@ -71,6 +71,31 @@ async function main() {
         await page.goto(pathToFileURL(path.resolve(file)).href + (cfg.slug === 'developer-toolbox' ? '#base64' : ''));
         await page.locator('#helpButton').waitFor();
         if (await page.locator('html').getAttribute('lang') !== language) await page.locator('#languageButton').click();
+        const headerState = async () => page.evaluate(() => {
+          const title = document.querySelector('.brand-title');
+          const headline = document.querySelector('#pageTitle');
+          const image = document.querySelector('.brand-mark img');
+          const header = document.querySelector('.header-inner');
+          return {
+            titleSize: getComputedStyle(title).fontSize,
+            headlineSize: getComputedStyle(headline).fontSize,
+            headerHeight: header.getBoundingClientRect().height,
+            titleWidth: title.getBoundingClientRect().width,
+            iconReady: image?.complete && image.naturalWidth === 64 && image.naturalHeight === 64,
+            iconSrc: image?.getAttribute('src'),
+            faviconHref: document.querySelector('link[rel="icon"]')?.getAttribute('href')
+          };
+        });
+        const firstHeader = await headerState();
+        assert.equal(firstHeader.iconReady, true, label + ': favicon image is decoded in header');
+        assert.equal(firstHeader.iconSrc, firstHeader.faviconHref, label + ': header uses favicon art');
+        await page.locator('#languageButton').click();
+        const otherHeader = await headerState();
+        assert.equal(otherHeader.titleSize, firstHeader.titleSize, label + ': header title font is language-independent');
+        assert.equal(otherHeader.headlineSize, firstHeader.headlineSize, label + ': page headline font is language-independent');
+        assert.ok(Math.abs(otherHeader.headerHeight-firstHeader.headerHeight) <= 1, label + ': header height does not jump on language switch');
+        assert.ok(Math.abs(otherHeader.titleWidth-firstHeader.titleWidth) <= 1, label + ': Pocket Level title width does not jump');
+        await page.locator('#languageButton').click();
  const headerVersion=page.locator('header .version-badge');
  assert.equal(await headerVersion.isVisible(),true,label+': header version is visible');
  assert.equal((await headerVersion.textContent()).trim(),'v'+JSON.parse(fs.readFileSync(path.resolve(__dirname,'../app.config.json'),'utf8')).version,label+': current version');
