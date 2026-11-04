@@ -1,0 +1,133 @@
+name: Package / publish GitHub Release
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/publish-release.yml
+      - .github/release-request.json
+      - scripts/package-release.ps1
+      - docs/releases/**
+      - CHANGELOG.md
+      - app.config.json
+      - README.md
+      - README.ja.md
+  push:
+    branches: [main]
+    paths:
+      - .github/release-request.json
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate versioned release request
+        shell: pwsh
+        run: |
+          $config = Get-Content -Raw -Encoding UTF8 app.config.json | ConvertFrom-Json
+          $request = Get-Content -Raw -Encoding UTF8 .github/release-request.json | ConvertFrom-Json
+          $expected = 'v' + $config.version
+          if ($request.tag -cne $expected) {
+            throw "Release request '$($request.tag)' does not match app.config.json '$expected'."
+          }
+          if (-not (Test-Path -LiteralPath "docs/releases/$expected.md" -PathType Leaf)) {
+            throw "Missing notes for $expected"
+          }
+      - name: Build standalone variants and run full regression suite
+        shell: powershell
+        run: .\scripts\check-repository.ps1
+      - name: Package release downloads and checksums
+        shell: powershell
+        run: .\scripts\package-release.ps1
+      - name: Upload checked release package for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  verify-downloads:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist
+      - name: Check asset count, SHA-256 digests and ZIP integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find release-dist -maxdepth 1 -type f | wc -l)" -eq 4
+          (cd release-dist && sha256sum --check SHA256SUMS.txt)
+          zip_files=(release-dist/htmlapps-pocket-level-v*.zip)
+          test "${#zip_files[@]}" -eq 1
+          unzip -t "${zip_files[0]}" >/dev/null
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [package, verify-downloads]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pocket-level-github-release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist
+      - name: Verify main commit, absent tag, package and checksums
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          requested="$(node -p "require('./.github/release-request.json').tag")"
+          expected="v$(node -p "require('./app.config.json').version")"
+          test "$requested" = "$expected" || { echo "Unexpected release tag: $requested"; exit 1; }
+          main_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          test "$GITHUB_SHA" = "$main_sha" || { echo "main moved while preparing the release; rerun on latest main"; exit 1; }
+          matches="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags" --jq ".[] | select(.ref == \"refs/tags/$requested\") | .ref")"
+          test -z "$matches" || { echo "Tag $requested already exists; refusing to overwrite it"; exit 1; }
+          test -f "docs/releases/$requested.md"
+          base="htmlapps-pocket-level-$requested"
+          for file in "$base.html" "$base.self-extract.html" "$base.zip" SHA256SUMS.txt; do
+            test -s "release-dist/$file" || { echo "Missing release asset: $file"; exit 1; }
+          done
+          (cd release-dist && sha256sum --check SHA256SUMS.txt)
+      - name: Create version tag and publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          requested="$(node -p "require('./.github/release-request.json').tag")"
+          base="htmlapps-pocket-level-$requested"
+          gh release create "$requested" \
+            "release-dist/$base.html" \
+            "release-dist/$base.self-extract.html" \
+            "release-dist/$base.zip" \
+            "release-dist/SHA256SUMS.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Pocket Level $requested" \
+            --notes-file "docs/releases/$requested.md" \
+            --latest
