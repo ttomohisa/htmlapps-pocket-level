@@ -1,0 +1,114 @@
+name: Package / publish GitHub Release
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/publish-release.yml
+      - scripts/package-release.ps1
+      - docs/releases/**
+      - CHANGELOG.md
+      - app.config.json
+      - README.md
+      - README.ja.md
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Type v1.2.0 to confirm the tag and public GitHub Release"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate explicit release request
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          if ($env:GITHUB_REF -ne 'refs/heads/main') { throw 'Releases must run from the main branch.' }
+          $config = Get-Content -Raw -Encoding UTF8 app.config.json | ConvertFrom-Json
+          $expected = 'v' + $config.version
+          if ($env:REQUESTED_TAG -cne $expected) {
+            throw "Requested tag '$env:REQUESTED_TAG' does not match app.config.json '$expected'."
+          }
+      - name: Build standalone variants and run full regression suite
+        shell: powershell
+        run: .\scripts\check-repository.ps1
+      - name: Package release downloads and checksums
+        shell: powershell
+        run: .\scripts\package-release.ps1
+      - name: Upload checked release package for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    if: github.event_name == 'workflow_dispatch'
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: pocket-level-github-release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: pocket-level-release-package
+          path: release-dist
+      - name: Verify main commit, absent tag, package and checksums
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          expected="v$(node -p "require('./app.config.json').version")"
+          test "$REQUESTED_TAG" = "$expected" || { echo "Unexpected release tag: $REQUESTED_TAG"; exit 1; }
+          main_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          test "$GITHUB_SHA" = "$main_sha" || { echo "main moved while preparing the release; rerun on latest main"; exit 1; }
+          matches="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags" --jq ".[] | select(.ref == \"refs/tags/$REQUESTED_TAG\") | .ref")"
+          test -z "$matches" || { echo "Tag $REQUESTED_TAG already exists; refusing to overwrite it"; exit 1; }
+          test -f "docs/releases/$REQUESTED_TAG.md"
+          base="htmlapps-pocket-level-$REQUESTED_TAG"
+          for file in "$base.html" "$base.self-extract.html" "$base.zip" SHA256SUMS.txt; do
+            test -s "release-dist/$file" || { echo "Missing release asset: $file"; exit 1; }
+          done
+          (cd release-dist && sha256sum --check SHA256SUMS.txt)
+      - name: Create version tag and publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          base="htmlapps-pocket-level-$REQUESTED_TAG"
+          gh release create "$REQUESTED_TAG" \
+            "release-dist/$base.html" \
+            "release-dist/$base.self-extract.html" \
+            "release-dist/$base.zip" \
+            "release-dist/SHA256SUMS.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Pocket Level $REQUESTED_TAG" \
+            --notes-file "docs/releases/$REQUESTED_TAG.md" \
+            --latest
